@@ -1,0 +1,11 @@
+{
+  "Name": "Customer Search Continuation",
+  "Goal": "Search for a customer in BankerInsight and return first name, last name, address, city, state, zip, and credit card id.",
+  "SurfaceType": "Windows",
+  "ComponentType": "Application",
+  "TaskPrefix": "Callable:",
+  "UserRequestFile": "customer-search-request.md",
+  "ApplicationHierarchyFile": "bankerinsight-hierarchy.json",
+  "CompletedStepsFile": "completed-steps.txt",
+  "DurableMemoryFile": "durable-memory.json"
+}

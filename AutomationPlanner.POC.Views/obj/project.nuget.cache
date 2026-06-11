@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "fYIwCuBbJ+M=",
+  "success": true,
+  "projectFilePath": "E:\\WebProjects\\openai-rasl-poc\\AutomationPlanner.POC.Views\\AutomationPlanner.POC.Views.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Admin\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

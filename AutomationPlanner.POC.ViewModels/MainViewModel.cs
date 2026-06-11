@@ -12,6 +12,12 @@ namespace AutomationPlanner.POC.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
+    private const string ScenarioFileType = "Scenario";
+    private const string UserRequestFileType = "User Request";
+    private const string ApplicationHierarchyFileType = "Application Hierarchy";
+    private const string CompletedStepsFileType = "Completed Steps";
+    private const string DurableMemoryFileType = "Durable Memory";
+
     private readonly IPlannerPackageLoader _packageLoader;
     private readonly IPromptAssembler _promptAssembler;
     private readonly IOpenAiPlannerClient _plannerClient;
@@ -33,6 +39,8 @@ public sealed class MainViewModel : ObservableObject
     private string _consoleText = string.Empty;
     private string _diagnosticsText = string.Empty;
     private string _askUserDefaultResponse = "Mock user approved.";
+    private string _selectedMockDataFileType = ScenarioFileType;
+    private string _specialFileName = "new-scenario";
     private AppSettings _settings = new();
 
     public MainViewModel(IPlannerPackageLoader packageLoader, IPromptAssembler promptAssembler, IOpenAiPlannerClient plannerClient, IPlannerValidator validator, IMockAutomationRuntime mockAutomationRuntime, ISettingsStore settingsStore, IExportService exportService)
@@ -45,11 +53,12 @@ public sealed class MainViewModel : ObservableObject
         _settingsStore = settingsStore;
         _exportService = exportService;
         ReloadPlannerCommand = new AsyncRelayCommand(ReloadPlannerAsync, () => !string.IsNullOrWhiteSpace(SelectedPlannerRoot));
-        LoadScenarioCommand = new RelayCommand(LoadSelectedScenario, () => SelectedScenario is not null);
+        LoadScenarioCommand = new RelayCommand(LoadSelectedScenario, () => _plannerPackage is not null && (!string.IsNullOrWhiteSpace(MockDataRelativePath) || SelectedScenario is not null));
         NewMockDataCommand = new RelayCommand(BeginNewMockData, () => _plannerPackage is not null);
+        ScaffoldMockDataCommand = new AsyncRelayCommand(ScaffoldMockDataAsync, () => _plannerPackage is not null);
         SaveMockDataCommand = new AsyncRelayCommand(SaveMockDataAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(MockDataRelativePath) && !string.IsNullOrWhiteSpace(ScenarioJson));
         DeleteMockDataCommand = new AsyncRelayCommand(DeleteMockDataAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(MockDataRelativePath));
-        ExecuteCommand = new AsyncRelayCommand(ExecuteAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(ScenarioJson));
+        ExecuteCommand = new AsyncRelayCommand(ExecuteAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(ScenarioJson) && IsScenarioFileType(SelectedMockDataFileType));
         RunAllCommand = new AsyncRelayCommand(RunAllAsync, () => _plannerPackage is not null && Scenarios.Count > 0);
         ExportCommand = new AsyncRelayCommand(ExportAsync, () => !string.IsNullOrWhiteSpace(PromptAssembly));
         SettingsViewModel = new SettingsViewModel(settingsStore);
@@ -58,10 +67,19 @@ public sealed class MainViewModel : ObservableObject
     public ObservableCollection<string> PackageTree { get; } = [];
     public ObservableCollection<string> UseCaseFolders { get; } = [];
     public ObservableCollection<ScenarioItemViewModel> Scenarios { get; } = [];
+    public ObservableCollection<string> MockDataFileTypes { get; } =
+    [
+        ScenarioFileType,
+        UserRequestFileType,
+        ApplicationHierarchyFileType,
+        CompletedStepsFileType,
+        DurableMemoryFileType
+    ];
     public SettingsViewModel SettingsViewModel { get; }
     public ICommand ReloadPlannerCommand { get; }
     public ICommand LoadScenarioCommand { get; }
     public ICommand NewMockDataCommand { get; }
+    public ICommand ScaffoldMockDataCommand { get; }
     public ICommand SaveMockDataCommand { get; }
     public ICommand DeleteMockDataCommand { get; }
     public ICommand ExecuteCommand { get; }
@@ -94,6 +112,8 @@ public sealed class MainViewModel : ObservableObject
                 {
                     MockDataRelativePath = value.RelativePath;
                     ScenarioJson = value.Scenario.Json;
+                    SpecialFileName = ExtractSpecialFileNameFromRelativePath(value.RelativePath);
+                    SelectedMockDataFileType = ScenarioFileType;
                 }
                 RaiseCommands();
             }
@@ -109,6 +129,31 @@ public sealed class MainViewModel : ObservableObject
     public string ConsoleText { get => _consoleText; set => SetProperty(ref _consoleText, value); }
     public string DiagnosticsText { get => _diagnosticsText; set => SetProperty(ref _diagnosticsText, value); }
     public string AskUserDefaultResponse { get => _askUserDefaultResponse; set => SetProperty(ref _askUserDefaultResponse, value); }
+    public string SelectedMockDataFileType
+    {
+        get => _selectedMockDataFileType;
+        set
+        {
+            if (SetProperty(ref _selectedMockDataFileType, value))
+            {
+                SyncMockDataRelativePathFromSelection();
+                RaiseCommands();
+            }
+        }
+    }
+
+    public string SpecialFileName
+    {
+        get => _specialFileName;
+        set
+        {
+            if (SetProperty(ref _specialFileName, value))
+            {
+                SyncMockDataRelativePathFromSelection();
+                RaiseCommands();
+            }
+        }
+    }
     public AppSettings Settings { get => _settings; set => SetProperty(ref _settings, value); }
 
     public async Task InitializeAsync()
@@ -142,8 +187,39 @@ public sealed class MainViewModel : ObservableObject
 
     public void LoadSelectedScenario()
     {
+        if (_plannerPackage is null) return;
+
+        if (!string.IsNullOrWhiteSpace(MockDataRelativePath))
+        {
+            try
+            {
+                var filePath = GetMockDataFilePath(MockDataRelativePath);
+                if (!File.Exists(filePath))
+                {
+                    AppendConsole($"File not found: {MockDataRelativePath}");
+                    return;
+                }
+
+                ScenarioJson = File.ReadAllText(filePath);
+                MockDataRelativePath = GetMockDataKey(filePath);
+                SpecialFileName = ExtractSpecialFileNameFromRelativePath(MockDataRelativePath);
+                SelectedMockDataFileType = GetMockDataFileTypeFromRelativePath(MockDataRelativePath);
+                MockDataRelativePath = GetMockDataKey(filePath);
+                AppendConsole($"Loaded file: {MockDataRelativePath}");
+                return;
+            }
+            catch (Exception ex)
+            {
+                AppendConsole($"Load failed: {ex.Message}");
+                return;
+            }
+        }
+
         if (SelectedScenario is null) return;
         ScenarioJson = SelectedScenario.Scenario.Json;
+        MockDataRelativePath = SelectedScenario.RelativePath;
+        SpecialFileName = ExtractSpecialFileNameFromRelativePath(SelectedScenario.RelativePath);
+        SelectedMockDataFileType = ScenarioFileType;
         MockDataRelativePath = SelectedScenario.RelativePath;
         AppendConsole($"Loaded scenario: {SelectedScenario.RelativePath}");
     }
@@ -151,13 +227,15 @@ public sealed class MainViewModel : ObservableObject
     public async Task ExecuteAsync()
     {
         if (_plannerPackage is null) return;
-        var scenario = ParseScenario("Ad hoc scenario", ScenarioJson);
-        _mockAutomationRuntime.LoadScenario(scenario.Parsed!);
+        var scenario = ParseScenario("Ad hoc scenario", ScenarioJson, MockDataRelativePath);
+        var preparedScenario = await PrepareScenarioForExecutionAsync(scenario);
+        var userRequest = await ResolveUserRequestAsync(preparedScenario);
+        _mockAutomationRuntime.LoadScenario(preparedScenario.Parsed!);
         _mockAutomationRuntime.SetAskUserDefaultResponse(AskUserDefaultResponse);
         var toolSnapshot = await _mockAutomationRuntime.GetToolResponseSnapshotAsync();
-        var executionScenario = CreateScenarioWithToolResponses(scenario, toolSnapshot);
+        var executionScenario = CreateScenarioWithToolResponses(preparedScenario, toolSnapshot);
         AppendConsole("Loaded per-tool response packets; ask_user questions will be answered through the app prompt UI.");
-        var assembly = _promptAssembler.Assemble(_plannerPackage, executionScenario, "Create an automation plan for the supplied scenario.");
+        var assembly = _promptAssembler.Assemble(_plannerPackage, executionScenario, userRequest);
         PromptAssembly = assembly.AssembledPrompt;
         UpdateDiagnostics(assembly);
         AppendConsole($"Prompt assembled. Estimated tokens: {assembly.EstimatedTokens}.");
@@ -195,20 +273,47 @@ public sealed class MainViewModel : ObservableObject
 
     private void BeginNewMockData()
     {
+        if (_plannerPackage is null) return;
+
         SelectedScenario = null;
         var selectedFolder = string.IsNullOrWhiteSpace(SelectedUseCaseFolder) ? "mock-data" : SelectedUseCaseFolder.TrimEnd('/');
-        MockDataRelativePath = $"{selectedFolder}/new-scenario.json";
-        ScenarioJson = string.Join(Environment.NewLine,
-            "{",
-            "  \"Name\": \"New Scenario\",",
-            "  \"Goal\": \"Describe the automation goal.\",",
-            "  \"SurfaceType\": \"Web\",",
-            "  \"ComponentType\": \"Form\",",
-            "  \"Applications\": [],",
-            "  \"InitialState\": {},",
-            "  \"ExpectedOutcome\": {}",
-            "}");
-        AppendConsole("Started a new mock-data JSON document.");
+        var specialName = NormalizeSpecialFileName(SpecialFileName);
+        SpecialFileName = specialName;
+        MockDataRelativePath = BuildSpecialFileRelativePath(selectedFolder, SelectedMockDataFileType, specialName);
+        ScenarioJson = BuildNewFileTemplate(SelectedMockDataFileType, specialName);
+        AppendConsole($"Started new {SelectedMockDataFileType} file: {MockDataRelativePath}");
+    }
+
+    private async Task ScaffoldMockDataAsync()
+    {
+        if (_plannerPackage is null) return;
+
+        var selectedFolder = string.IsNullOrWhiteSpace(SelectedUseCaseFolder) ? "mock-data" : SelectedUseCaseFolder.TrimEnd('/');
+        var specialName = NormalizeSpecialFileName(SpecialFileName);
+        SpecialFileName = specialName;
+
+        var pathsAndContent = new (string RelativePath, string Content)[]
+        {
+            (BuildSpecialFileRelativePath(selectedFolder, ScenarioFileType, specialName), BuildNewFileTemplate(ScenarioFileType, specialName)),
+            (BuildSpecialFileRelativePath(selectedFolder, UserRequestFileType, specialName), BuildNewFileTemplate(UserRequestFileType, specialName)),
+            (BuildSpecialFileRelativePath(selectedFolder, ApplicationHierarchyFileType, specialName), BuildNewFileTemplate(ApplicationHierarchyFileType, specialName)),
+            (BuildSpecialFileRelativePath(selectedFolder, CompletedStepsFileType, specialName), BuildNewFileTemplate(CompletedStepsFileType, specialName)),
+            (BuildSpecialFileRelativePath(selectedFolder, DurableMemoryFileType, specialName), BuildNewFileTemplate(DurableMemoryFileType, specialName))
+        };
+
+        foreach (var (relativePath, content) in pathsAndContent)
+        {
+            var filePath = GetMockDataFilePath(relativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            await File.WriteAllTextAsync(filePath, NormalizeContentForSave(GetMockDataFileTypeFromRelativePath(relativePath), content));
+        }
+
+        MockDataRelativePath = pathsAndContent[0].RelativePath;
+        SelectedMockDataFileType = ScenarioFileType;
+        ScenarioJson = BuildNewFileTemplate(ScenarioFileType, specialName);
+
+        await RefreshPlannerPackageAfterMockDataChangeAsync(MockDataRelativePath, ScenarioJson);
+        AppendConsole($"Scaffolded scenario bundle: {specialName} in {selectedFolder}");
     }
 
     private async Task SaveMockDataAsync()
@@ -217,15 +322,16 @@ public sealed class MainViewModel : ObservableObject
 
         try
         {
-            var parsed = JObject.Parse(ScenarioJson);
-            var formattedJson = parsed.ToString(Newtonsoft.Json.Formatting.Indented);
+            var contentToSave = NormalizeContentForSave(SelectedMockDataFileType, ScenarioJson);
             var filePath = GetMockDataFilePath(MockDataRelativePath);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
-            await File.WriteAllTextAsync(filePath, formattedJson);
+            await File.WriteAllTextAsync(filePath, contentToSave);
 
             var savedKey = GetMockDataKey(filePath);
-            AppendConsole($"Saved mock-data scenario: {savedKey}");
-            await RefreshPlannerPackageAfterMockDataChangeAsync(savedKey, formattedJson);
+            AppendConsole($"Saved {SelectedMockDataFileType} file: {savedKey}");
+
+            var isScenarioFile = IsScenarioFileType(SelectedMockDataFileType);
+            await RefreshPlannerPackageAfterMockDataChangeAsync(isScenarioFile ? savedKey : null, isScenarioFile ? contentToSave : null, preserveEditorSelection: !isScenarioFile);
         }
         catch (Exception ex)
         {
@@ -248,8 +354,9 @@ public sealed class MainViewModel : ObservableObject
 
             var deletedKey = GetMockDataKey(filePath);
             File.Delete(filePath);
-            AppendConsole($"Deleted mock-data scenario: {deletedKey}");
-            await RefreshPlannerPackageAfterMockDataChangeAsync();
+            var isScenarioFile = IsScenarioFileType(SelectedMockDataFileType);
+            AppendConsole($"Deleted {SelectedMockDataFileType} file: {deletedKey}");
+            await RefreshPlannerPackageAfterMockDataChangeAsync(preserveEditorSelection: !isScenarioFile);
             ScenarioJson = string.Empty;
             MockDataRelativePath = string.Empty;
         }
@@ -259,8 +366,10 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    private async Task RefreshPlannerPackageAfterMockDataChangeAsync(string? selectedKey = null, string? scenarioJson = null)
+    private async Task RefreshPlannerPackageAfterMockDataChangeAsync(string? selectedKey = null, string? scenarioJson = null, bool preserveEditorSelection = false)
     {
+        var currentPath = MockDataRelativePath;
+        var currentContent = ScenarioJson;
         _plannerPackage = await _packageLoader.LoadAsync(SelectedPlannerRoot, Settings.MockDataBasePath);
         RefreshPackageTree();
         RefreshUseCaseFolders(GetUseCaseFolderForScenarioKey(selectedKey));
@@ -269,6 +378,11 @@ public sealed class MainViewModel : ObservableObject
         {
             MockDataRelativePath = selectedKey;
             ScenarioJson = scenarioJson ?? SelectedScenario?.Scenario.Json ?? ScenarioJson;
+        }
+        else if (preserveEditorSelection)
+        {
+            MockDataRelativePath = currentPath;
+            ScenarioJson = currentContent;
         }
         UpdateDiagnostics();
         RaiseCommands();
@@ -355,8 +469,11 @@ public sealed class MainViewModel : ObservableObject
         {
             try
             {
-                var scenario = ParseScenario(Path.GetFileNameWithoutExtension(file.Key), file.Value);
-                scenario.RelativePath = file.Key;
+                if (!TryParseScenario(Path.GetFileNameWithoutExtension(file.Key), file.Value, file.Key, out var scenario) || scenario is null)
+                {
+                    continue;
+                }
+
                 Scenarios.Add(new ScenarioItemViewModel(scenario));
             }
             catch (Exception ex)
@@ -402,9 +519,426 @@ public sealed class MainViewModel : ObservableObject
             : folder;
     }
 
-    private static ScenarioDocument ParseScenario(string name, string json)
+    private static bool TryParseScenario(string name, string json, string relativePath, out ScenarioDocument? scenario)
     {
-        return new ScenarioDocument { Name = name, Json = json, Parsed = JObject.Parse(json) };
+        scenario = null;
+        JObject parsed;
+
+        try
+        {
+            parsed = JObject.Parse(json);
+        }
+        catch
+        {
+            return false;
+        }
+
+        if (!LooksLikeScenario(parsed))
+        {
+            return false;
+        }
+
+        scenario = new ScenarioDocument
+        {
+            Name = name,
+            RelativePath = relativePath,
+            Parsed = parsed,
+            Json = parsed.ToString(Newtonsoft.Json.Formatting.Indented)
+        };
+        return true;
+    }
+
+    private static bool LooksLikeScenario(JObject parsed)
+    {
+        return parsed["Goal"] is not null
+               || parsed["UserRequest"] is not null
+               || parsed["UserRequestFile"] is not null
+               || parsed["SurfaceType"] is not null
+               || parsed["ApplicationHierarchyFile"] is not null;
+    }
+
+    private async Task<ScenarioDocument> PrepareScenarioForExecutionAsync(ScenarioDocument scenario)
+    {
+        if (_plannerPackage is null) return scenario;
+
+        var enriched = (JObject)(scenario.Parsed?.DeepClone() ?? JObject.Parse(scenario.Json));
+        var applicationHierarchyFile = enriched["ApplicationHierarchyFile"]?.ToString();
+        if (!string.IsNullOrWhiteSpace(applicationHierarchyFile))
+        {
+            var hierarchyPath = ResolveLinkedMockDataFilePath(scenario, applicationHierarchyFile, "ApplicationHierarchyFile");
+            var hierarchyJson = await File.ReadAllTextAsync(hierarchyPath);
+            enriched["ApplicationHierarchy"] = JToken.Parse(hierarchyJson);
+            AppendConsole($"Loaded ApplicationHierarchy from linked file: {applicationHierarchyFile}");
+        }
+
+        var completedStepsFile = enriched["CompletedStepsFile"]?.ToString();
+        if (!string.IsNullOrWhiteSpace(completedStepsFile))
+        {
+            var completedStepsPath = ResolveLinkedMockDataFilePath(scenario, completedStepsFile, "CompletedStepsFile");
+            var completedStepsText = await File.ReadAllTextAsync(completedStepsPath);
+            enriched["CompletedSteps"] = ParseCompletedStepsToken(completedStepsText);
+            AppendConsole($"Loaded CompletedSteps from linked file: {completedStepsFile}");
+        }
+
+        var durableMemoryFile = enriched["DurableMemoryFile"]?.ToString();
+        if (!string.IsNullOrWhiteSpace(durableMemoryFile))
+        {
+            var durableMemoryPath = ResolveLinkedMockDataFilePath(scenario, durableMemoryFile, "DurableMemoryFile");
+            var durableMemoryJson = await File.ReadAllTextAsync(durableMemoryPath);
+            var durableMemoryToken = JToken.Parse(durableMemoryJson);
+            if (durableMemoryToken is not JObject durableMemoryObject)
+            {
+                throw new InvalidDataException("DurableMemoryFile must contain a JSON object.");
+            }
+
+            enriched["DurableMemory"] = durableMemoryObject;
+            AppendConsole($"Loaded DurableMemory from linked file: {durableMemoryFile}");
+        }
+
+        return new ScenarioDocument
+        {
+            Name = scenario.Name,
+            RelativePath = scenario.RelativePath,
+            Parsed = enriched,
+            Json = enriched.ToString(Newtonsoft.Json.Formatting.Indented)
+        };
+    }
+
+    private static JArray ParseCompletedStepsToken(string text)
+    {
+        var rawText = text ?? string.Empty;
+        var trimmed = rawText.Trim();
+        if (string.IsNullOrWhiteSpace(trimmed))
+        {
+            return [];
+        }
+
+        if (trimmed.StartsWith("[", StringComparison.Ordinal))
+        {
+            var parsedToken = JToken.Parse(trimmed);
+            if (parsedToken is JArray parsedArray)
+            {
+                return parsedArray;
+            }
+
+            throw new InvalidDataException("CompletedStepsFile JSON must be an array of step summaries.");
+        }
+
+        var lines = rawText
+            .Replace("\r", string.Empty, StringComparison.Ordinal)
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim())
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.StartsWith("- ", StringComparison.Ordinal) || x.StartsWith("* ", StringComparison.Ordinal) ? x[2..].Trim() : x);
+
+        return new JArray(lines);
+    }
+
+    private async Task<string> ResolveUserRequestAsync(ScenarioDocument scenario)
+    {
+        const string defaultRequest = "Create an automation plan for the supplied scenario.";
+        var parsed = scenario.Parsed ?? JObject.Parse(scenario.Json);
+
+        var userRequestFile = parsed["UserRequestFile"]?.ToString();
+        if (!string.IsNullOrWhiteSpace(userRequestFile))
+        {
+            var requestPath = ResolveLinkedMockDataFilePath(scenario, userRequestFile, "UserRequestFile");
+            var fileRequest = (await File.ReadAllTextAsync(requestPath)).Trim();
+            if (!string.IsNullOrWhiteSpace(fileRequest))
+            {
+                AppendConsole($"Loaded user request from linked file: {userRequestFile}");
+                return fileRequest;
+            }
+        }
+
+        var inlineRequest = parsed["UserRequest"]?.ToString()?.Trim();
+        if (!string.IsNullOrWhiteSpace(inlineRequest))
+        {
+            return inlineRequest;
+        }
+
+        var structuredRequest = BuildStructuredScenarioRequest(parsed);
+        if (!string.IsNullOrWhiteSpace(structuredRequest))
+        {
+            AppendConsole("Built user request from scenario fields (Goal/SurfaceType/TaskPrefix/CompletedSteps/DurableMemory).");
+            return structuredRequest;
+        }
+
+        return defaultRequest;
+    }
+
+    private static string BuildStructuredScenarioRequest(JObject scenario)
+    {
+        var goal = GetScenarioTextValue(scenario, "Goal");
+        var surfaceType = GetScenarioTextValue(scenario, "SurfaceType", "Surface Type");
+        var taskPrefix = GetScenarioTextValue(scenario, "TaskPrefix", "Task Prefix", "Task_Prefix");
+
+        var completedStepsToken = GetScenarioToken(scenario, "CompletedSteps", "CompletedStepSummaries");
+        var durableMemoryToken = GetScenarioToken(scenario, "DurableMemory");
+
+        if (string.IsNullOrWhiteSpace(goal)
+            && string.IsNullOrWhiteSpace(surfaceType)
+            && string.IsNullOrWhiteSpace(taskPrefix)
+            && IsNullOrEmptyToken(completedStepsToken)
+            && IsNullOrEmptyToken(durableMemoryToken))
+        {
+            return string.Empty;
+        }
+
+        var request = new System.Text.StringBuilder();
+        AppendRequestSection(request, "Goal", string.IsNullOrWhiteSpace(goal) ? "(not provided)" : goal);
+        AppendRequestSection(request, "Surface Type", string.IsNullOrWhiteSpace(surfaceType) ? "(not provided)" : surfaceType);
+        AppendRequestSection(request, "Task Prefix", string.IsNullOrWhiteSpace(taskPrefix) ? "(none)" : taskPrefix);
+        AppendRequestSection(request, "Completed Steps", FormatRequestToken(completedStepsToken));
+        AppendRequestSection(request, "Durable Memory", FormatRequestToken(durableMemoryToken));
+        return request.ToString().Trim();
+    }
+
+    private static string GetScenarioTextValue(JObject scenario, params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            var value = scenario[key]?.ToString()?.Trim();
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private static JToken? GetScenarioToken(JObject scenario, params string[] keys)
+    {
+        foreach (var key in keys)
+        {
+            var token = scenario[key];
+            if (token is not null && token.Type != JTokenType.Null)
+            {
+                return token;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool IsNullOrEmptyToken(JToken? token)
+    {
+        if (token is null || token.Type == JTokenType.Null) return true;
+        if (token is JArray array) return array.Count == 0;
+        if (token is JObject obj) return !obj.Properties().Any();
+        if (token.Type == JTokenType.String) return string.IsNullOrWhiteSpace(token.ToString());
+        return false;
+    }
+
+    private static string FormatRequestToken(JToken? token)
+    {
+        if (IsNullOrEmptyToken(token))
+        {
+            return "(none)";
+        }
+
+        var content = token!;
+
+        return content is JValue
+            ? content.ToString()
+            : content.ToString(Newtonsoft.Json.Formatting.Indented);
+    }
+
+    private static void AppendRequestSection(System.Text.StringBuilder builder, string heading, string content)
+    {
+        if (builder.Length > 0)
+        {
+            builder.AppendLine();
+        }
+
+        builder.AppendLine($"# {heading}");
+        builder.AppendLine(content);
+    }
+
+    private static bool IsScenarioFileType(string fileType) => string.Equals(fileType, ScenarioFileType, StringComparison.OrdinalIgnoreCase);
+
+    private static string GetMockDataFileTypeFromRelativePath(string relativePath)
+    {
+        var lower = relativePath.ToLowerInvariant();
+        if (lower.EndsWith(".user-request.md")) return UserRequestFileType;
+        if (lower.EndsWith(".application-hierarchy.json")) return ApplicationHierarchyFileType;
+        if (lower.EndsWith(".completed-steps.txt")) return CompletedStepsFileType;
+        if (lower.EndsWith(".durable-memory.json")) return DurableMemoryFileType;
+        return ScenarioFileType;
+    }
+
+    private static string NormalizeContentForSave(string fileType, string content)
+    {
+        if (string.Equals(fileType, UserRequestFileType, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(fileType, CompletedStepsFileType, StringComparison.OrdinalIgnoreCase))
+        {
+            return content ?? string.Empty;
+        }
+
+        var parsed = JToken.Parse(content);
+        return parsed.ToString(Newtonsoft.Json.Formatting.Indented);
+    }
+
+    private static string BuildSpecialFileRelativePath(string selectedFolder, string fileType, string specialName)
+    {
+        var fileName = fileType switch
+        {
+            var x when string.Equals(x, ScenarioFileType, StringComparison.OrdinalIgnoreCase) => $"{specialName}.scenario.json",
+            var x when string.Equals(x, UserRequestFileType, StringComparison.OrdinalIgnoreCase) => $"{specialName}.user-request.md",
+            var x when string.Equals(x, ApplicationHierarchyFileType, StringComparison.OrdinalIgnoreCase) => $"{specialName}.application-hierarchy.json",
+            var x when string.Equals(x, CompletedStepsFileType, StringComparison.OrdinalIgnoreCase) => $"{specialName}.completed-steps.txt",
+            var x when string.Equals(x, DurableMemoryFileType, StringComparison.OrdinalIgnoreCase) => $"{specialName}.durable-memory.json",
+            _ => $"{specialName}.scenario.json"
+        };
+
+        return $"{selectedFolder}/{fileName}";
+    }
+
+    private static string BuildNewFileTemplate(string fileType, string specialName)
+    {
+        return fileType switch
+        {
+            var x when string.Equals(x, ScenarioFileType, StringComparison.OrdinalIgnoreCase) => string.Join(Environment.NewLine,
+                "{",
+                "  \"Name\": \"New Scenario\",",
+                "  \"Goal\": \"Describe the automation goal.\",",
+                "  \"SurfaceType\": \"Windows\",",
+                "  \"TaskPrefix\": \"\",",
+                $"  \"UserRequestFile\": \"{specialName}.user-request.md\",",
+                $"  \"ApplicationHierarchyFile\": \"{specialName}.application-hierarchy.json\",",
+                $"  \"CompletedStepsFile\": \"{specialName}.completed-steps.txt\",",
+                $"  \"DurableMemoryFile\": \"{specialName}.durable-memory.json\"",
+                "}"),
+            var x when string.Equals(x, UserRequestFileType, StringComparison.OrdinalIgnoreCase) => "Describe the user request for this scenario.",
+            var x when string.Equals(x, ApplicationHierarchyFileType, StringComparison.OrdinalIgnoreCase) => string.Join(Environment.NewLine,
+                "{",
+                "  \"ApplicationName\": \"\",",
+                "  \"Technology\": \"Windows\",",
+                "  \"TopLevelContainers\": []",
+                "}"),
+            var x when string.Equals(x, CompletedStepsFileType, StringComparison.OrdinalIgnoreCase) => string.Join(Environment.NewLine,
+                "navigation: Opened target application",
+                "navigation: Reached working screen"),
+            var x when string.Equals(x, DurableMemoryFileType, StringComparison.OrdinalIgnoreCase) => string.Join(Environment.NewLine,
+                "{",
+                "  \"automationSignatures\": [],",
+                "  \"notes\": []",
+                "}"),
+            _ => string.Empty
+        };
+    }
+
+    private static string NormalizeSpecialFileName(string value)
+    {
+        var raw = (value ?? string.Empty).Trim();
+        if (string.IsNullOrWhiteSpace(raw)) raw = "new-scenario";
+
+        foreach (var invalid in Path.GetInvalidFileNameChars())
+        {
+            raw = raw.Replace(invalid, '-');
+        }
+
+        raw = raw.Replace(' ', '-').Trim('-');
+        return string.IsNullOrWhiteSpace(raw) ? "new-scenario" : raw;
+    }
+
+    private static string ExtractSpecialFileNameFromRelativePath(string relativePath)
+    {
+        var fileName = Path.GetFileName(relativePath.Replace('/', Path.DirectorySeparatorChar));
+        if (string.IsNullOrWhiteSpace(fileName)) return "new-scenario";
+
+        var knownSuffixes = new[]
+        {
+            ".scenario.json",
+            ".user-request.md",
+            ".application-hierarchy.json",
+            ".completed-steps.txt",
+            ".durable-memory.json",
+            ".json",
+            ".md",
+            ".txt"
+        };
+
+        foreach (var suffix in knownSuffixes)
+        {
+            if (fileName.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            {
+                var value = fileName[..^suffix.Length];
+                return string.IsNullOrWhiteSpace(value) ? "new-scenario" : value;
+            }
+        }
+
+        return fileName;
+    }
+
+    private void SyncMockDataRelativePathFromSelection()
+    {
+        if (_plannerPackage is null) return;
+
+        var selectedFolder = string.IsNullOrWhiteSpace(SelectedUseCaseFolder) ? "mock-data" : SelectedUseCaseFolder.TrimEnd('/');
+        var specialName = NormalizeSpecialFileName(_specialFileName);
+        if (!string.Equals(_specialFileName, specialName, StringComparison.Ordinal))
+        {
+            _specialFileName = specialName;
+            OnPropertyChanged(nameof(SpecialFileName));
+        }
+
+        var nextRelativePath = BuildSpecialFileRelativePath(selectedFolder, SelectedMockDataFileType, specialName);
+        if (!string.Equals(_mockDataRelativePath, nextRelativePath, StringComparison.OrdinalIgnoreCase))
+        {
+            _mockDataRelativePath = nextRelativePath;
+            OnPropertyChanged(nameof(MockDataRelativePath));
+        }
+    }
+
+    private string ResolveLinkedMockDataFilePath(ScenarioDocument scenario, string linkedPath, string fieldName)
+    {
+        if (_plannerPackage is null) throw new InvalidOperationException("Load a planner package before resolving linked mock-data files.");
+
+        var normalizedLinkedPath = (linkedPath ?? string.Empty).Trim().Replace('\\', '/');
+        if (string.IsNullOrWhiteSpace(normalizedLinkedPath))
+        {
+            throw new InvalidOperationException($"{fieldName} cannot be blank.");
+        }
+
+        var mockDataRoot = Path.GetFullPath(_plannerPackage.MockDataRootPath);
+        var attemptedPaths = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(scenario.RelativePath))
+        {
+            var scenarioRelative = NormalizeMockDataRelativePath(scenario.RelativePath);
+            var scenarioDirectory = Path.GetDirectoryName(scenarioRelative.Replace('/', Path.DirectorySeparatorChar));
+            if (!string.IsNullOrWhiteSpace(scenarioDirectory))
+            {
+                var scenarioFolderCandidate = Path.GetFullPath(Path.Combine(mockDataRoot, scenarioDirectory, normalizedLinkedPath.Replace('/', Path.DirectorySeparatorChar)));
+                attemptedPaths.Add(scenarioFolderCandidate);
+            }
+        }
+
+        var rootCandidate = Path.GetFullPath(Path.Combine(mockDataRoot, normalizedLinkedPath.Replace('/', Path.DirectorySeparatorChar)));
+        attemptedPaths.Add(rootCandidate);
+
+        foreach (var candidate in attemptedPaths.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (!IsPathUnderRoot(mockDataRoot, candidate)) continue;
+            if (File.Exists(candidate)) return candidate;
+        }
+
+        throw new FileNotFoundException($"Could not resolve {fieldName} file '{linkedPath}' under mock-data root '{mockDataRoot}'.");
+    }
+
+    private static bool IsPathUnderRoot(string rootPath, string fullPath)
+    {
+        var normalizedRoot = Path.GetFullPath(rootPath);
+        var normalizedFullPath = Path.GetFullPath(fullPath);
+        var rootWithSeparator = normalizedRoot.EndsWith(Path.DirectorySeparatorChar) ? normalizedRoot : normalizedRoot + Path.DirectorySeparatorChar;
+        return normalizedFullPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static ScenarioDocument ParseScenario(string name, string json, string? relativePath = null)
+    {
+        return new ScenarioDocument { Name = name, RelativePath = relativePath ?? string.Empty, Json = json, Parsed = JObject.Parse(json) };
     }
 
     private static ScenarioDocument CreateScenarioWithToolResponses(ScenarioDocument scenario, JObject toolResponses)
@@ -425,10 +959,6 @@ public sealed class MainViewModel : ObservableObject
         if (_plannerPackage is null) throw new InvalidOperationException("Load a planner package before editing mock data.");
 
         var normalized = NormalizeMockDataRelativePath(relativePath);
-        if (!normalized.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
-        {
-            normalized += ".json";
-        }
 
         var root = Path.GetFullPath(_plannerPackage.MockDataRootPath);
         var fullPath = Path.GetFullPath(Path.Combine(root, normalized.Replace('/', Path.DirectorySeparatorChar)));
@@ -460,7 +990,7 @@ public sealed class MainViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(normalized))
         {
-            throw new InvalidOperationException("Enter a mock-data JSON file name before saving.");
+            throw new InvalidOperationException("Enter a mock-data file name before saving.");
         }
 
         return normalized;

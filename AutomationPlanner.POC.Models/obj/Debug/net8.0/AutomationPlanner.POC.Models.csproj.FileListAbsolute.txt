@@ -1,0 +1,13 @@
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\bin\Debug\net8.0\AutomationPlanner.POC.Models.deps.json
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\bin\Debug\net8.0\AutomationPlanner.POC.Models.dll
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\bin\Debug\net8.0\AutomationPlanner.POC.Models.pdb
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.csproj.AssemblyReference.cache
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.GeneratedMSBuildEditorConfig.editorconfig
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.AssemblyInfoInputs.cache
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.AssemblyInfo.cs
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.csproj.CoreCompileInputs.cache
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.sourcelink.json
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.dll
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\refint\AutomationPlanner.POC.Models.dll
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\AutomationPlanner.POC.Models.pdb
+E:\WebProjects\openai-rasl-poc\AutomationPlanner.POC.Models\obj\Debug\net8.0\ref\AutomationPlanner.POC.Models.dll

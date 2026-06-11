@@ -1,0 +1,19 @@
+{
+  "automationSignatures": [
+    {
+      "name": "NormalizeCustomerId",
+      "isApplicationMethod": false,
+      "description": "Normalizes customer id values before search.",
+      "parameters": [
+        {
+          "name": "rawCustomerId",
+          "type": "string"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Customer Id field accepts either numeric id or external account id.",
+    "Result grid loads asynchronously after Search is clicked."
+  ]
+}

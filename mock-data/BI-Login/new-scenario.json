@@ -1,0 +1,9 @@
+{
+  "Name": "Login as secondary goal",
+  "Goal": "Perform a customer search in BankerInsight and then return first name, last name, address, city, state, zip and credit card id.",
+  "SurfaceType": "Windows",
+  "ComponentType": "Application",
+  "Applications": [],
+  "InitialState": {},
+  "ExpectedOutcome": {}
+}

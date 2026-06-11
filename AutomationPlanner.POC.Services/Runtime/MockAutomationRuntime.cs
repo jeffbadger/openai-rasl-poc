@@ -88,6 +88,12 @@ public sealed class MockAutomationRuntime : IMockAutomationRuntime
             byName[packet["ToolName"]?.ToString() ?? string.Empty] = packet.DeepClone();
         }
 
+        if (byName["get_screen_state"] is JToken screenStatePacket)
+        {
+            byName["get_screen_hierarchy"] = screenStatePacket.DeepClone();
+            byName["get-screen-hierarchy"] = screenStatePacket.DeepClone();
+        }
+
         var explicitToolResponses = _scenario["MockRuntime"]?["ToolResponses"] as JObject ?? new JObject();
         foreach (var response in explicitToolResponses.Properties())
         {
@@ -117,6 +123,9 @@ public sealed class MockAutomationRuntime : IMockAutomationRuntime
     private static string NormalizeToolName(string toolName) => toolName.Trim().ToLowerInvariant() switch
     {
         "getscreenstate" => "get_screen_state",
+        "get_screen_hierarchy" => "get_screen_state",
+        "getscreenhierarchy" => "get_screen_state",
+        "get-screen-hierarchy" => "get_screen_state",
         "getexcelstructure" => "get_excel_structure",
         "getcallablesignatures" => "get_callable_signatures",
         "askuser" => "ask_user",

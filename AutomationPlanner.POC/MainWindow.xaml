@@ -40,11 +40,16 @@
                     <ComboBox ItemsSource="{Binding Scenarios}" SelectedItem="{Binding SelectedScenario}" DisplayMemberPath="Name"/>
                     <TextBlock Text="ask_user app answer" Margin="0,6,0,0"/>
                     <TextBox Text="{Binding AskUserDefaultResponse, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"/>
+                    <TextBlock Text="File type" Margin="0,6,0,0"/>
+                    <ComboBox ItemsSource="{Binding MockDataFileTypes}" SelectedItem="{Binding SelectedMockDataFileType}"/>
+                    <TextBlock Text="Special scenario name" Margin="0,6,0,0"/>
+                    <TextBox Text="{Binding SpecialFileName, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Text="File path under mock-data" Margin="0,6,0,0"/>
                     <TextBox Text="{Binding MockDataRelativePath, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas"/>
                     <WrapPanel Margin="0,6,0,0">
                         <Button Content="Load" Command="{Binding LoadScenarioCommand}" Margin="0,0,6,0"/>
                         <Button Content="New" Command="{Binding NewMockDataCommand}" Margin="0,0,6,0"/>
+                        <Button Content="Scaffold" Command="{Binding ScaffoldMockDataCommand}" Margin="0,0,6,0"/>
                         <Button Content="Save" Command="{Binding SaveMockDataCommand}" Margin="0,0,6,0"/>
                         <Button Content="Delete" Command="{Binding DeleteMockDataCommand}" Margin="0,0,6,0"/>
                     </WrapPanel>
