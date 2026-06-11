@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1450" height="900" viewBox="0 0 1450 900" role="img" aria-labelledby="title desc">
   <title id="title">Automation Planner POC main window screenshot</title>
-  <desc id="desc">Illustrative screenshot of the main application window showing the planner package explorer, mock data editor, execution result tabs, and execution console.</desc>
+  <desc id="desc">Illustrative screenshot of the main application window showing the planner package explorer, execution use case folder selector, mock data editor, execution result tabs, and execution console.</desc>
   <defs>
     <style>
       .window { fill: #f5f5f5; stroke: #9a9a9a; }
@@ -38,40 +38,47 @@
   <text x="58" y="346" class="mono">surfaces/web.md</text>
   <text x="58" y="370" class="mono">patterns/form-fill.md</text>
   <text x="38" y="406" class="mono">mock-data/</text>
-  <text x="58" y="430" class="mono">login-web.json</text>
-  <text x="58" y="454" class="mono">excel-pipeline.json</text>
+  <text x="58" y="430" class="mono">claims/</text>
+  <text x="78" y="454" class="mono">intake.json</text>
+  <text x="58" y="478" class="mono">login-web.json</text>
+  <text x="58" y="502" class="mono">excel-pipeline.json</text>
 
   <rect class="panel" x="318" y="48" width="414" height="660" rx="5" />
   <text x="330" y="78" class="header">Mock Data JSON Editor</text>
-  <text x="330" y="112" class="label">Mock-data scenario</text>
+  <text x="330" y="112" class="label">Execution use case folder</text>
   <rect x="330" y="122" width="378" height="32" fill="#fff" stroke="#b7b7b7" />
-  <text x="340" y="143" class="label">login-web.json</text>
-  <text x="330" y="178" class="label">File path under mock-data</text>
-  <rect x="330" y="188" width="378" height="32" fill="#fff" stroke="#b7b7b7" />
-  <text x="340" y="209" class="mono">login-web.json</text>
-  <rect class="button" x="330" y="232" width="56" height="30" rx="3" />
-  <text x="344" y="252" class="label">Load</text>
-  <rect class="button" x="394" y="232" width="56" height="30" rx="3" />
-  <text x="411" y="252" class="label">New</text>
-  <rect class="button" x="458" y="232" width="56" height="30" rx="3" />
-  <text x="472" y="252" class="label">Save</text>
-  <rect class="button" x="522" y="232" width="64" height="30" rx="3" />
-  <text x="535" y="252" class="label">Delete</text>
-  <rect class="button" x="330" y="274" width="72" height="30" rx="3" />
-  <text x="345" y="294" class="label">Execute</text>
-  <rect class="button" x="410" y="274" width="70" height="30" rx="3" />
-  <text x="425" y="294" class="label">Run All</text>
-  <rect class="button" x="488" y="274" width="64" height="30" rx="3" />
-  <text x="502" y="294" class="label">Export</text>
-  <rect x="330" y="318" width="378" height="360" fill="#fbfbfb" stroke="#d1d5db" />
-  <text x="342" y="344" class="mono">{</text>
-  <text x="362" y="368" class="mono">&quot;Name&quot;: &quot;Web login&quot;,</text>
-  <text x="362" y="392" class="mono">&quot;UserRequest&quot;: &quot;Log in to the portal&quot;,</text>
-  <text x="362" y="416" class="mono">&quot;MockRuntime&quot;: {</text>
-  <text x="382" y="440" class="mono">&quot;ScreenState&quot;: { &quot;surface&quot;: &quot;web&quot; },</text>
-  <text x="382" y="464" class="mono">&quot;AskUserResponses&quot;: { ... }</text>
-  <text x="362" y="488" class="mono">}</text>
-  <text x="342" y="512" class="mono">}</text>
+  <text x="340" y="143" class="label">mock-data/claims</text>
+  <path d="M690 134 l8 0 l-4 6 z" fill="#4b5563" />
+  <text x="330" y="168" class="label">Mock-data scenario</text>
+  <rect x="330" y="178" width="378" height="32" fill="#fff" stroke="#b7b7b7" />
+  <text x="340" y="199" class="label">intake.json</text>
+  <path d="M690 190 l8 0 l-4 6 z" fill="#4b5563" />
+  <text x="330" y="234" class="label">File path under mock-data</text>
+  <rect x="330" y="244" width="378" height="32" fill="#fff" stroke="#b7b7b7" />
+  <text x="340" y="265" class="mono">mock-data/claims/intake.json</text>
+  <rect class="button" x="330" y="288" width="56" height="30" rx="3" />
+  <text x="344" y="308" class="label">Load</text>
+  <rect class="button" x="394" y="288" width="56" height="30" rx="3" />
+  <text x="411" y="308" class="label">New</text>
+  <rect class="button" x="458" y="288" width="56" height="30" rx="3" />
+  <text x="472" y="308" class="label">Save</text>
+  <rect class="button" x="522" y="288" width="64" height="30" rx="3" />
+  <text x="535" y="308" class="label">Delete</text>
+  <rect class="button" x="330" y="330" width="72" height="30" rx="3" />
+  <text x="345" y="350" class="label">Execute</text>
+  <rect class="button" x="410" y="330" width="70" height="30" rx="3" />
+  <text x="425" y="350" class="label">Run All</text>
+  <rect class="button" x="488" y="330" width="64" height="30" rx="3" />
+  <text x="502" y="350" class="label">Export</text>
+  <rect x="330" y="374" width="378" height="304" fill="#fbfbfb" stroke="#d1d5db" />
+  <text x="342" y="400" class="mono">{</text>
+  <text x="362" y="424" class="mono">&quot;Name&quot;: &quot;Claims intake&quot;,</text>
+  <text x="362" y="448" class="mono">&quot;UserRequest&quot;: &quot;Process a claim&quot;,</text>
+  <text x="362" y="472" class="mono">&quot;MockRuntime&quot;: {</text>
+  <text x="382" y="496" class="mono">&quot;ScreenState&quot;: { &quot;surface&quot;: &quot;web&quot; },</text>
+  <text x="382" y="520" class="mono">&quot;AskUserResponses&quot;: { ... }</text>
+  <text x="362" y="544" class="mono">}</text>
+  <text x="342" y="568" class="mono">}</text>
 
   <rect class="panel" x="748" y="48" width="690" height="660" rx="5" />
   <text x="760" y="78" class="header">Execution Results</text>
@@ -100,6 +107,6 @@
   <text x="24" y="752" class="header">Execution Console</text>
   <rect x="24" y="764" width="1392" height="96" fill="#111827" stroke="#374151" />
   <text x="42" y="794" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:13] Loaded planner package: automation-planner-v2</text>
-  <text x="42" y="820" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:16] Scenario enriched with MockToolResponses</text>
-  <text x="42" y="846" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:19] Planner response validated successfully</text>
+  <text x="42" y="820" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:16] Selected execution use case folder: mock-data/claims</text>
+  <text x="42" y="846" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:19] OpenAI call completed; planner response validated</text>
 </svg>

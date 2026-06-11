@@ -20,6 +20,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly IExportService _exportService;
     private PlannerPackage? _plannerPackage;
     private ScenarioItemViewModel? _selectedScenario;
+    private string _selectedUseCaseFolder = string.Empty;
     private string _selectedPlannerRoot = string.Empty;
     private string _scenarioJson = string.Empty;
     private string _mockDataRelativePath = string.Empty;
@@ -53,6 +54,7 @@ public sealed class MainViewModel : ObservableObject
     }
 
     public ObservableCollection<string> PackageTree { get; } = [];
+    public ObservableCollection<string> UseCaseFolders { get; } = [];
     public ObservableCollection<ScenarioItemViewModel> Scenarios { get; } = [];
     public SettingsViewModel SettingsViewModel { get; }
     public ICommand ReloadPlannerCommand { get; }
@@ -65,6 +67,20 @@ public sealed class MainViewModel : ObservableObject
     public ICommand ExportCommand { get; }
 
     public string SelectedPlannerRoot { get => _selectedPlannerRoot; set { if (SetProperty(ref _selectedPlannerRoot, value)) RaiseCommands(); } }
+
+    public string SelectedUseCaseFolder
+    {
+        get => _selectedUseCaseFolder;
+        set
+        {
+            if (SetProperty(ref _selectedUseCaseFolder, value))
+            {
+                DiscoverScenarios();
+                AppendConsole($"Selected execution use case folder: {GetUseCaseDisplayName(value)}");
+                RaiseCommands();
+            }
+        }
+    }
     public ScenarioItemViewModel? SelectedScenario
     {
         get => _selectedScenario;
@@ -109,6 +125,7 @@ public sealed class MainViewModel : ObservableObject
         Settings.LastPlannerPackagePath = SelectedPlannerRoot;
         await _settingsStore.SaveAsync(Settings);
         RefreshPackageTree();
+        RefreshUseCaseFolders();
         DiscoverScenarios();
         UpdateDiagnostics();
         AppendConsole($"Loaded {_plannerPackage.ReferenceFiles.Count} references and {Scenarios.Count} scenarios.");
@@ -170,7 +187,8 @@ public sealed class MainViewModel : ObservableObject
     private void BeginNewMockData()
     {
         SelectedScenario = null;
-        MockDataRelativePath = "mock-data/new-scenario.json";
+        var selectedFolder = string.IsNullOrWhiteSpace(SelectedUseCaseFolder) ? "mock-data" : SelectedUseCaseFolder.TrimEnd('/');
+        MockDataRelativePath = $"{selectedFolder}/new-scenario.json";
         ScenarioJson = string.Join(Environment.NewLine,
             "{",
             "  \"Name\": \"New Scenario\",",
@@ -236,6 +254,7 @@ public sealed class MainViewModel : ObservableObject
     {
         _plannerPackage = await _packageLoader.LoadAsync(SelectedPlannerRoot, Settings.MockDataBasePath);
         RefreshPackageTree();
+        RefreshUseCaseFolders(GetUseCaseFolderForScenarioKey(selectedKey));
         DiscoverScenarios(selectedKey);
         if (!string.IsNullOrWhiteSpace(selectedKey))
         {
@@ -283,11 +302,47 @@ public sealed class MainViewModel : ObservableObject
         foreach (var mock in _plannerPackage.MockDataFiles.Keys) PackageTree.Add("  " + mock);
     }
 
+    private void RefreshUseCaseFolders(string? selectedFolder = null)
+    {
+        UseCaseFolders.Clear();
+        if (_plannerPackage is null) return;
+
+        var folders = new SortedSet<string>(StringComparer.OrdinalIgnoreCase) { "mock-data" };
+        if (Directory.Exists(_plannerPackage.MockDataRootPath))
+        {
+            foreach (var directory in Directory.EnumerateDirectories(_plannerPackage.MockDataRootPath, "*", SearchOption.AllDirectories))
+            {
+                var relative = Path.GetRelativePath(_plannerPackage.MockDataRootPath, directory).Replace(Path.DirectorySeparatorChar, '/');
+                if (!string.IsNullOrWhiteSpace(relative) && relative != ".")
+                {
+                    folders.Add($"mock-data/{relative}");
+                }
+            }
+        }
+
+        foreach (var folder in folders)
+        {
+            UseCaseFolders.Add(folder);
+        }
+
+        var nextSelection = !string.IsNullOrWhiteSpace(selectedFolder) && UseCaseFolders.Contains(selectedFolder, StringComparer.OrdinalIgnoreCase)
+            ? UseCaseFolders.First(x => string.Equals(x, selectedFolder, StringComparison.OrdinalIgnoreCase))
+            : UseCaseFolders.FirstOrDefault() ?? string.Empty;
+
+        if (!string.Equals(_selectedUseCaseFolder, nextSelection, StringComparison.OrdinalIgnoreCase))
+        {
+            _selectedUseCaseFolder = nextSelection;
+            OnPropertyChanged(nameof(SelectedUseCaseFolder));
+        }
+    }
+
     private void DiscoverScenarios(string? selectedKey = null)
     {
         Scenarios.Clear();
         if (_plannerPackage is null) return;
-        foreach (var file in _plannerPackage.MockDataFiles.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
+        foreach (var file in _plannerPackage.MockDataFiles
+                     .Where(x => IsScenarioInSelectedUseCaseFolder(x.Key))
+                     .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
         {
             try
             {
@@ -300,9 +355,42 @@ public sealed class MainViewModel : ObservableObject
                 AppendConsole($"Skipping invalid scenario {file.Key}: {ex.Message}");
             }
         }
-        SelectedScenario = string.IsNullOrWhiteSpace(selectedKey)
+        var nextScenario = string.IsNullOrWhiteSpace(selectedKey)
             ? Scenarios.FirstOrDefault()
             : Scenarios.FirstOrDefault(x => string.Equals(x.RelativePath, selectedKey, StringComparison.OrdinalIgnoreCase)) ?? Scenarios.FirstOrDefault();
+        SelectedScenario = nextScenario;
+        if (nextScenario is null)
+        {
+            ScenarioJson = string.Empty;
+            MockDataRelativePath = string.Empty;
+        }
+    }
+
+    private bool IsScenarioInSelectedUseCaseFolder(string scenarioKey)
+    {
+        if (string.IsNullOrWhiteSpace(SelectedUseCaseFolder) || string.Equals(SelectedUseCaseFolder, "mock-data", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var selectedFolderPrefix = SelectedUseCaseFolder.TrimEnd('/') + "/";
+        return scenarioKey.StartsWith(selectedFolderPrefix, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string? GetUseCaseFolderForScenarioKey(string? scenarioKey)
+    {
+        if (string.IsNullOrWhiteSpace(scenarioKey)) return null;
+
+        var normalized = scenarioKey.Replace('\\', '/');
+        var lastSlash = normalized.LastIndexOf('/');
+        return lastSlash <= "mock-data".Length ? "mock-data" : normalized[..lastSlash];
+    }
+
+    private static string GetUseCaseDisplayName(string folder)
+    {
+        return string.IsNullOrWhiteSpace(folder) || string.Equals(folder, "mock-data", StringComparison.OrdinalIgnoreCase)
+            ? "mock-data (all scenarios)"
+            : folder;
     }
 
     private static ScenarioDocument ParseScenario(string name, string json)

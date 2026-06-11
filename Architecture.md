@@ -8,18 +8,19 @@ The POC is designed around provider-neutral interfaces so the desktop shell can 
 
 1. The user selects a planner package root.
 2. `IPlannerPackageLoader` reads `SKILL.md`, recursive markdown references, test files, and mock scenario JSON files from either the package `mock-data/` folder or a configured external mock data base folder.
-3. The UI lists package contents and scenarios.
-4. The user loads and optionally edits scenario JSON.
-5. `IMockAutomationRuntime` loads the scenario mock data and produces a `MockToolResponses` snapshot for fake tools such as `get_screen_state()`, `get_excel_structure()`, `get_callable_signatures()`, and `ask_user()`.
-6. `IPromptAssembler` composes the final prompt in this order:
+3. The UI lists package contents, the resolved mock-data root and child folders, and scenarios filtered by the selected execution use-case folder.
+4. The user selects a use-case folder, loads a scenario from that scope, and optionally edits scenario JSON.
+5. Clicking **Execute** triggers the WPF button binding for `ExecuteCommand`; `AsyncRelayCommand` invokes `MainViewModel.ExecuteAsync` when a planner package is loaded and scenario JSON is available.
+6. `IMockAutomationRuntime` loads the scenario mock data and produces a `MockToolResponses` snapshot for fake tools such as `get_screen_state()`, `get_excel_structure()`, `get_callable_signatures()`, and `ask_user()`.
+7. `IPromptAssembler` composes the final prompt in this order:
    - System header
    - `SKILL.md`
    - selected reference files
    - scenario JSON enriched with `MockToolResponses`
    - user request
-7. `IOpenAiPlannerClient` sends the prompt to the OpenAI Responses API.
-8. `IPlannerValidator` validates that the response is JSON and includes the planner contract fields.
-9. Results are displayed in prompt, raw request, raw response, planner JSON, validation, diagnostics, and console views.
+8. `IOpenAiPlannerClient` serializes the Responses API request model and sends it to `/v1/responses`.
+9. `IPlannerValidator` validates that the response is JSON and includes the planner contract fields.
+10. Results are displayed in prompt, raw request, raw response, planner JSON, validation, diagnostics, and console views.
 
 ## Extensibility seams
 

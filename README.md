@@ -21,7 +21,7 @@ A .NET 8 WPF proof-of-concept that loads an Automation Planner skill package fro
 4. Run the application.
 5. Open **Settings**, enter an OpenAI API key, set the planner package folder, optionally set a separate mock data base folder, and save.
 6. Alternatively, use **Browse Folder** on the main window to select `automation-planner-v2`.
-7. Click **Reload Planner**, select a scenario, click **Load Scenario**, then **Execute**.
+7. Click **Reload Planner**, choose an **Execution use case folder** (the mock-data root or one of its child folders), select a scenario, click **Load Scenario**, then **Execute**.
 
 Settings are saved locally under the current user's application data folder and API keys are never hardcoded in source.
 
@@ -49,13 +49,15 @@ tests/
 mock-data/
 ```
 
-The loader recursively reads `references/**/*.md` and discovers scenarios from either the package `mock-data/**/*.json` folder or the configured external mock data base folder. Adding new planner packages, reference files, scenarios, or mock data does not require code changes.
+The loader recursively reads `references/**/*.md` and discovers scenarios from either the package `mock-data/**/*.json` folder or the configured external mock data base folder. The main workspace exposes an **Execution use case folder** dropdown populated with the mock-data root and every child folder so execution can be scoped to a specific use-case folder before choosing a scenario. Adding new planner packages, reference files, scenarios, use-case folders, or mock data does not require code changes.
 
 ## Planner package and mock data storage
 
 The Settings screen has separate folder fields for the automation planner package and the mock data base folder. The planner package folder points to the directory containing `SKILL.md`, `references/`, and `tests/`. The mock data base folder points to the directory whose recursive JSON files should be treated as scenarios.
 
 If Mock Data Base Folder is blank, mock data defaults to the selected planner package's `mock-data/` directory. For example, if the planner package is `C:\PlannerPackages\AutomationPlannerV2`, scenarios are discovered from `C:\PlannerPackages\AutomationPlannerV2\mock-data\**\*.json`. If Mock Data Base Folder is set to `D:\AutomationMocks`, scenarios are discovered from `D:\AutomationMocks\**\*.json` instead.
+
+The **Execution use case folder** dropdown is built from that resolved mock-data base folder. Selecting `mock-data` shows all scenarios; selecting a child folder such as `mock-data/claims` filters the scenario list and **Run All** to JSON files in that folder subtree. The **Execute** button sends the currently loaded scenario JSON, so edit or load the desired scenario after selecting the folder.
 
 The app does not copy planner packages or mock data into AppData. AppData is used only for local user settings such as the selected planner package folder, mock data base folder, model name, timeout, and API key. If a team wants centrally managed mock data, place the mock data base folder in a shared repository or network folder and select that folder in the app.
 
@@ -71,6 +73,11 @@ Supported built-in mock tool keys are:
 - `CallableSignatures` for `get_callable_signatures()`
 - `AskUserResponses` for `ask_user(question)`
 - `ToolResponses` for additional named fake tool responses
+
+
+## How execution triggers a request
+
+The **Execute** button is bound to `ExecuteCommand` in the main view model. WPF invokes that command when the button is clicked, and the command runs `ExecuteAsync` only when a planner package is loaded and the scenario JSON is not blank. `ExecuteAsync` parses the editor JSON, loads it into the mock automation runtime, captures mock tool responses, assembles the prompt, and then calls `IOpenAiPlannerClient.CreatePlanAsync`. The OpenAI client serializes the request model and posts it to `/v1/responses`; the resulting raw request, raw response, planner JSON, validation output, and console messages are displayed in the execution result tabs.
 
 ## OpenAI integration
 

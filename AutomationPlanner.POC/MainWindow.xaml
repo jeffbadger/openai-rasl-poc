@@ -34,7 +34,9 @@
             <DockPanel Grid.Column="1" Margin="8">
                 <TextBlock DockPanel.Dock="Top" Text="Mock Data JSON Editor" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
                 <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
-                    <TextBlock Text="Mock-data scenario"/>
+                    <TextBlock Text="Execution use case folder"/>
+                    <ComboBox ItemsSource="{Binding UseCaseFolders}" SelectedItem="{Binding SelectedUseCaseFolder}"/>
+                    <TextBlock Text="Mock-data scenario" Margin="0,6,0,0"/>
                     <ComboBox ItemsSource="{Binding Scenarios}" SelectedItem="{Binding SelectedScenario}" DisplayMemberPath="Name"/>
                     <TextBlock Text="File path under mock-data" Margin="0,6,0,0"/>
                     <TextBox Text="{Binding MockDataRelativePath, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas"/>
