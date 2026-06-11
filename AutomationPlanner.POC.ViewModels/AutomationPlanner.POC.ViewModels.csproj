@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><EnableWindowsTargeting>true</EnableWindowsTargeting></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <ProjectReference Include="..\AutomationPlanner.POC.Core\AutomationPlanner.POC.Core.csproj" />
+    <ProjectReference Include="..\AutomationPlanner.POC.Models\AutomationPlanner.POC.Models.csproj" />
+    <ProjectReference Include="..\AutomationPlanner.POC.Services\AutomationPlanner.POC.Services.csproj" />
+  </ItemGroup>
+</Project>
