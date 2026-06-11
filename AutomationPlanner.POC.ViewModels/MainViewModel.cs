@@ -22,6 +22,7 @@ public sealed class MainViewModel : ObservableObject
     private ScenarioItemViewModel? _selectedScenario;
     private string _selectedPlannerRoot = string.Empty;
     private string _scenarioJson = string.Empty;
+    private string _mockDataRelativePath = string.Empty;
     private string _promptAssembly = string.Empty;
     private string _rawRequest = string.Empty;
     private string _rawResponse = string.Empty;
@@ -42,6 +43,9 @@ public sealed class MainViewModel : ObservableObject
         _exportService = exportService;
         ReloadPlannerCommand = new AsyncRelayCommand(ReloadPlannerAsync, () => !string.IsNullOrWhiteSpace(SelectedPlannerRoot));
         LoadScenarioCommand = new RelayCommand(LoadSelectedScenario, () => SelectedScenario is not null);
+        NewMockDataCommand = new RelayCommand(BeginNewMockData, () => _plannerPackage is not null);
+        SaveMockDataCommand = new AsyncRelayCommand(SaveMockDataAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(MockDataRelativePath) && !string.IsNullOrWhiteSpace(ScenarioJson));
+        DeleteMockDataCommand = new AsyncRelayCommand(DeleteMockDataAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(MockDataRelativePath));
         ExecuteCommand = new AsyncRelayCommand(ExecuteAsync, () => _plannerPackage is not null && !string.IsNullOrWhiteSpace(ScenarioJson));
         RunAllCommand = new AsyncRelayCommand(RunAllAsync, () => _plannerPackage is not null && Scenarios.Count > 0);
         ExportCommand = new AsyncRelayCommand(ExportAsync, () => !string.IsNullOrWhiteSpace(PromptAssembly));
@@ -53,13 +57,32 @@ public sealed class MainViewModel : ObservableObject
     public SettingsViewModel SettingsViewModel { get; }
     public ICommand ReloadPlannerCommand { get; }
     public ICommand LoadScenarioCommand { get; }
+    public ICommand NewMockDataCommand { get; }
+    public ICommand SaveMockDataCommand { get; }
+    public ICommand DeleteMockDataCommand { get; }
     public ICommand ExecuteCommand { get; }
     public ICommand RunAllCommand { get; }
     public ICommand ExportCommand { get; }
 
     public string SelectedPlannerRoot { get => _selectedPlannerRoot; set { if (SetProperty(ref _selectedPlannerRoot, value)) RaiseCommands(); } }
-    public ScenarioItemViewModel? SelectedScenario { get => _selectedScenario; set { if (SetProperty(ref _selectedScenario, value)) RaiseCommands(); } }
+    public ScenarioItemViewModel? SelectedScenario
+    {
+        get => _selectedScenario;
+        set
+        {
+            if (SetProperty(ref _selectedScenario, value))
+            {
+                if (value is not null)
+                {
+                    MockDataRelativePath = value.RelativePath;
+                    ScenarioJson = value.Scenario.Json;
+                }
+                RaiseCommands();
+            }
+        }
+    }
     public string ScenarioJson { get => _scenarioJson; set { if (SetProperty(ref _scenarioJson, value)) RaiseCommands(); } }
+    public string MockDataRelativePath { get => _mockDataRelativePath; set { if (SetProperty(ref _mockDataRelativePath, value)) RaiseCommands(); } }
     public string PromptAssembly { get => _promptAssembly; set => SetProperty(ref _promptAssembly, value); }
     public string RawRequest { get => _rawRequest; set => SetProperty(ref _rawRequest, value); }
     public string RawResponse { get => _rawResponse; set => SetProperty(ref _rawResponse, value); }
@@ -96,6 +119,7 @@ public sealed class MainViewModel : ObservableObject
     {
         if (SelectedScenario is null) return;
         ScenarioJson = SelectedScenario.Scenario.Json;
+        MockDataRelativePath = SelectedScenario.RelativePath;
         AppendConsole($"Loaded scenario: {SelectedScenario.RelativePath}");
     }
 
@@ -143,6 +167,85 @@ public sealed class MainViewModel : ObservableObject
         AppendConsole($"Batch complete. Passed: {pass}. Failed: {fail}.");
     }
 
+    private void BeginNewMockData()
+    {
+        SelectedScenario = null;
+        MockDataRelativePath = "mock-data/new-scenario.json";
+        ScenarioJson = string.Join(Environment.NewLine,
+            "{",
+            "  \"Name\": \"New Scenario\",",
+            "  \"Goal\": \"Describe the automation goal.\",",
+            "  \"SurfaceType\": \"Web\",",
+            "  \"ComponentType\": \"Form\",",
+            "  \"Applications\": [],",
+            "  \"InitialState\": {},",
+            "  \"ExpectedOutcome\": {}",
+            "}");
+        AppendConsole("Started a new mock-data JSON document.");
+    }
+
+    private async Task SaveMockDataAsync()
+    {
+        if (_plannerPackage is null) return;
+
+        try
+        {
+            var parsed = JObject.Parse(ScenarioJson);
+            var formattedJson = parsed.ToString(Newtonsoft.Json.Formatting.Indented);
+            var filePath = GetMockDataFilePath(MockDataRelativePath);
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+            await File.WriteAllTextAsync(filePath, formattedJson);
+
+            var savedKey = GetMockDataKey(filePath);
+            AppendConsole($"Saved mock-data scenario: {savedKey}");
+            await RefreshPlannerPackageAfterMockDataChangeAsync(savedKey, formattedJson);
+        }
+        catch (Exception ex)
+        {
+            AppendConsole($"Save failed: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteMockDataAsync()
+    {
+        if (_plannerPackage is null) return;
+
+        try
+        {
+            var filePath = GetMockDataFilePath(MockDataRelativePath);
+            if (!File.Exists(filePath))
+            {
+                AppendConsole($"Mock-data scenario was already missing: {MockDataRelativePath}");
+                return;
+            }
+
+            var deletedKey = GetMockDataKey(filePath);
+            File.Delete(filePath);
+            AppendConsole($"Deleted mock-data scenario: {deletedKey}");
+            await RefreshPlannerPackageAfterMockDataChangeAsync();
+            ScenarioJson = string.Empty;
+            MockDataRelativePath = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            AppendConsole($"Delete failed: {ex.Message}");
+        }
+    }
+
+    private async Task RefreshPlannerPackageAfterMockDataChangeAsync(string? selectedKey = null, string? scenarioJson = null)
+    {
+        _plannerPackage = await _packageLoader.LoadAsync(SelectedPlannerRoot, Settings.MockDataBasePath);
+        RefreshPackageTree();
+        DiscoverScenarios(selectedKey);
+        if (!string.IsNullOrWhiteSpace(selectedKey))
+        {
+            MockDataRelativePath = selectedKey;
+            ScenarioJson = scenarioJson ?? SelectedScenario?.Scenario.Json ?? ScenarioJson;
+        }
+        UpdateDiagnostics();
+        RaiseCommands();
+    }
+
     private async Task ExportAsync()
     {
         var exportRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "AutomationPlannerExports", DateTime.Now.ToString("yyyyMMdd-HHmmss"));
@@ -180,7 +283,7 @@ public sealed class MainViewModel : ObservableObject
         foreach (var mock in _plannerPackage.MockDataFiles.Keys) PackageTree.Add("  " + mock);
     }
 
-    private void DiscoverScenarios()
+    private void DiscoverScenarios(string? selectedKey = null)
     {
         Scenarios.Clear();
         if (_plannerPackage is null) return;
@@ -197,7 +300,9 @@ public sealed class MainViewModel : ObservableObject
                 AppendConsole($"Skipping invalid scenario {file.Key}: {ex.Message}");
             }
         }
-        SelectedScenario = Scenarios.FirstOrDefault();
+        SelectedScenario = string.IsNullOrWhiteSpace(selectedKey)
+            ? Scenarios.FirstOrDefault()
+            : Scenarios.FirstOrDefault(x => string.Equals(x.RelativePath, selectedKey, StringComparison.OrdinalIgnoreCase)) ?? Scenarios.FirstOrDefault();
     }
 
     private static ScenarioDocument ParseScenario(string name, string json)
@@ -218,6 +323,52 @@ public sealed class MainViewModel : ObservableObject
         };
     }
 
+    private string GetMockDataFilePath(string relativePath)
+    {
+        if (_plannerPackage is null) throw new InvalidOperationException("Load a planner package before editing mock data.");
+
+        var normalized = NormalizeMockDataRelativePath(relativePath);
+        if (!normalized.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            normalized += ".json";
+        }
+
+        var root = Path.GetFullPath(_plannerPackage.MockDataRootPath);
+        var fullPath = Path.GetFullPath(Path.Combine(root, normalized.Replace('/', Path.DirectorySeparatorChar)));
+        var rootWithSeparator = root.EndsWith(Path.DirectorySeparatorChar) ? root : root + Path.DirectorySeparatorChar;
+        if (!fullPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException("Mock-data paths must stay inside the configured mock-data folder.");
+        }
+
+        return fullPath;
+    }
+
+    private string GetMockDataKey(string filePath)
+    {
+        if (_plannerPackage is null) throw new InvalidOperationException("Load a planner package before editing mock data.");
+
+        var relative = Path.GetRelativePath(_plannerPackage.MockDataRootPath, filePath).Replace(Path.DirectorySeparatorChar, '/');
+        return $"mock-data/{relative}";
+    }
+
+    private static string NormalizeMockDataRelativePath(string relativePath)
+    {
+        var normalized = (relativePath ?? string.Empty).Trim().Replace('\\', '/');
+        while (normalized.StartsWith("/", StringComparison.Ordinal)) normalized = normalized[1..];
+        if (normalized.StartsWith("mock-data/", StringComparison.OrdinalIgnoreCase))
+        {
+            normalized = normalized["mock-data/".Length..];
+        }
+
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            throw new InvalidOperationException("Enter a mock-data JSON file name before saving.");
+        }
+
+        return normalized;
+    }
+
     private void UpdateDiagnostics(PromptAssembly? assembly = null)
     {
         DiagnosticsText = $"Planner Package Loaded: {_plannerPackage is not null}\n" +
@@ -234,6 +385,9 @@ public sealed class MainViewModel : ObservableObject
     {
         (ReloadPlannerCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (LoadScenarioCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (NewMockDataCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (SaveMockDataCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
+        (DeleteMockDataCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (ExecuteCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (RunAllCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
         (ExportCommand as AsyncRelayCommand)?.RaiseCanExecuteChanged();
