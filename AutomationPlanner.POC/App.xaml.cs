@@ -12,7 +12,7 @@ using AutomationPlanner.POC.ViewModels;
 
 namespace AutomationPlanner.POC;
 
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     public MainViewModel MainViewModel { get; private set; } = null!;
 

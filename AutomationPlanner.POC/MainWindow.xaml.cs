@@ -28,7 +28,7 @@ public partial class MainWindow : System.Windows.Window
             return Dispatcher.InvokeAsync(() => ShowAskUserDialogAsync(question, cancellationToken)).Task.Unwrap();
         }
 
-        var answerBox = new TextBox
+        var answerBox = new System.Windows.Controls.TextBox
         {
             Text = ViewModel.AskUserDefaultResponse,
             MinWidth = 420,
@@ -37,12 +37,12 @@ public partial class MainWindow : System.Windows.Window
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             MinHeight = 80
         };
-        var useAnswerButton = new Button { Content = "Use Answer", IsDefault = true, MinWidth = 96, Margin = new Thickness(0, 0, 8, 0) };
-        var useDefaultButton = new Button { Content = "Use Default", IsCancel = true, MinWidth = 96 };
+        var useAnswerButton = new System.Windows.Controls.Button { Content = "Use Answer", IsDefault = true, MinWidth = 96, Margin = new Thickness(0, 0, 8, 0) };
+        var useDefaultButton = new System.Windows.Controls.Button { Content = "Use Default", IsCancel = true, MinWidth = 96 };
         var buttonPanel = new StackPanel
         {
-            Orientation = Orientation.Horizontal,
-            HorizontalAlignment = HorizontalAlignment.Right,
+            Orientation = System.Windows.Controls.Orientation.Horizontal,
+            HorizontalAlignment = System.Windows.HorizontalAlignment.Right,
             Margin = new Thickness(0, 12, 0, 0),
             Children = { useAnswerButton, useDefaultButton }
         }.Dock(Dock.Bottom);
