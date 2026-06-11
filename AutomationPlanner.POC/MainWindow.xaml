@@ -32,11 +32,19 @@
             </DockPanel>
 
             <DockPanel Grid.Column="1" Margin="8">
-                <TextBlock DockPanel.Dock="Top" Text="Scenario Workspace" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
+                <TextBlock DockPanel.Dock="Top" Text="Mock Data JSON Editor" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
                 <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <TextBlock Text="Mock-data scenario"/>
                     <ComboBox ItemsSource="{Binding Scenarios}" SelectedItem="{Binding SelectedScenario}" DisplayMemberPath="Name"/>
+                    <TextBlock Text="File path under mock-data" Margin="0,6,0,0"/>
+                    <TextBox Text="{Binding MockDataRelativePath, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas"/>
                     <WrapPanel Margin="0,6,0,0">
-                        <Button Content="Load Scenario" Command="{Binding LoadScenarioCommand}" Margin="0,0,6,0"/>
+                        <Button Content="Load" Command="{Binding LoadScenarioCommand}" Margin="0,0,6,0"/>
+                        <Button Content="New" Command="{Binding NewMockDataCommand}" Margin="0,0,6,0"/>
+                        <Button Content="Save" Command="{Binding SaveMockDataCommand}" Margin="0,0,6,0"/>
+                        <Button Content="Delete" Command="{Binding DeleteMockDataCommand}" Margin="0,0,6,0"/>
+                    </WrapPanel>
+                    <WrapPanel Margin="0,6,0,0">
                         <Button Content="Execute" Command="{Binding ExecuteCommand}" Margin="0,0,6,0"/>
                         <Button Content="Run All" Command="{Binding RunAllCommand}" Margin="0,0,6,0"/>
                         <Button Content="Export" Command="{Binding ExportCommand}"/>
