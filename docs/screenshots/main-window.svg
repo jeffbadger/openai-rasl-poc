@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1450" height="900" viewBox="0 0 1450 900" role="img" aria-labelledby="title desc">
+  <title id="title">Automation Planner POC main window screenshot</title>
+  <desc id="desc">Illustrative screenshot of the main application window showing the planner package explorer, mock data editor, execution result tabs, and execution console.</desc>
+  <defs>
+    <style>
+      .window { fill: #f5f5f5; stroke: #9a9a9a; }
+      .chrome { fill: #e9eef8; }
+      .panel { fill: #ffffff; stroke: #c8c8c8; }
+      .header { font: 700 18px Segoe UI, Arial, sans-serif; fill: #1f2937; }
+      .label { font: 13px Segoe UI, Arial, sans-serif; fill: #374151; }
+      .mono { font: 13px Consolas, monospace; fill: #1f2937; }
+      .button { fill: #f3f4f6; stroke: #9ca3af; }
+      .tab { fill: #eef2ff; stroke: #a5b4fc; }
+      .active { fill: #ffffff; stroke: #818cf8; }
+      .muted { fill: #6b7280; }
+    </style>
+  </defs>
+
+  <rect class="window" x="0.5" y="0.5" width="1449" height="899" rx="8" />
+  <rect class="chrome" x="1" y="1" width="1448" height="34" rx="8" />
+  <text x="18" y="23" class="label">Automation Planner POC</text>
+
+  <rect class="panel" x="12" y="48" width="290" height="660" rx="5" />
+  <text x="24" y="78" class="header">Planner Package Explorer</text>
+  <text x="24" y="112" class="label">Selected planner root</text>
+  <rect x="24" y="122" width="255" height="32" fill="#fff" stroke="#b7b7b7" />
+  <text x="31" y="143" class="mono">C:\Planner\automation-planner-v2</text>
+  <rect class="button" x="24" y="166" width="105" height="30" rx="3" />
+  <text x="39" y="186" class="label">Browse Folder</text>
+  <rect class="button" x="139" y="166" width="115" height="30" rx="3" />
+  <text x="154" y="186" class="label">Reload Planner</text>
+  <rect class="button" x="24" y="204" width="230" height="30" rx="3" />
+  <text x="115" y="224" class="label">Settings</text>
+  <rect x="24" y="248" width="255" height="430" fill="#fbfbfb" stroke="#d1d5db" />
+  <text x="38" y="274" class="mono">SKILL.md</text>
+  <text x="38" y="298" class="mono">references/</text>
+  <text x="58" y="322" class="mono">planning-core.md</text>
+  <text x="58" y="346" class="mono">surfaces/web.md</text>
+  <text x="58" y="370" class="mono">patterns/form-fill.md</text>
+  <text x="38" y="406" class="mono">mock-data/</text>
+  <text x="58" y="430" class="mono">login-web.json</text>
+  <text x="58" y="454" class="mono">excel-pipeline.json</text>
+
+  <rect class="panel" x="318" y="48" width="414" height="660" rx="5" />
+  <text x="330" y="78" class="header">Mock Data JSON Editor</text>
+  <text x="330" y="112" class="label">Mock-data scenario</text>
+  <rect x="330" y="122" width="378" height="32" fill="#fff" stroke="#b7b7b7" />
+  <text x="340" y="143" class="label">login-web.json</text>
+  <text x="330" y="178" class="label">File path under mock-data</text>
+  <rect x="330" y="188" width="378" height="32" fill="#fff" stroke="#b7b7b7" />
+  <text x="340" y="209" class="mono">login-web.json</text>
+  <rect class="button" x="330" y="232" width="56" height="30" rx="3" />
+  <text x="344" y="252" class="label">Load</text>
+  <rect class="button" x="394" y="232" width="56" height="30" rx="3" />
+  <text x="411" y="252" class="label">New</text>
+  <rect class="button" x="458" y="232" width="56" height="30" rx="3" />
+  <text x="472" y="252" class="label">Save</text>
+  <rect class="button" x="522" y="232" width="64" height="30" rx="3" />
+  <text x="535" y="252" class="label">Delete</text>
+  <rect class="button" x="330" y="274" width="72" height="30" rx="3" />
+  <text x="345" y="294" class="label">Execute</text>
+  <rect class="button" x="410" y="274" width="70" height="30" rx="3" />
+  <text x="425" y="294" class="label">Run All</text>
+  <rect class="button" x="488" y="274" width="64" height="30" rx="3" />
+  <text x="502" y="294" class="label">Export</text>
+  <rect x="330" y="318" width="378" height="360" fill="#fbfbfb" stroke="#d1d5db" />
+  <text x="342" y="344" class="mono">{</text>
+  <text x="362" y="368" class="mono">&quot;Name&quot;: &quot;Web login&quot;,</text>
+  <text x="362" y="392" class="mono">&quot;UserRequest&quot;: &quot;Log in to the portal&quot;,</text>
+  <text x="362" y="416" class="mono">&quot;MockRuntime&quot;: {</text>
+  <text x="382" y="440" class="mono">&quot;ScreenState&quot;: { &quot;surface&quot;: &quot;web&quot; },</text>
+  <text x="382" y="464" class="mono">&quot;AskUserResponses&quot;: { ... }</text>
+  <text x="362" y="488" class="mono">}</text>
+  <text x="342" y="512" class="mono">}</text>
+
+  <rect class="panel" x="748" y="48" width="690" height="660" rx="5" />
+  <text x="760" y="78" class="header">Execution Results</text>
+  <rect class="active" x="760" y="98" width="128" height="34" rx="4" />
+  <text x="774" y="120" class="label">Prompt Assembly</text>
+  <rect class="tab" x="888" y="98" width="95" height="34" rx="4" />
+  <text x="904" y="120" class="label">Raw Request</text>
+  <rect class="tab" x="983" y="98" width="102" height="34" rx="4" />
+  <text x="998" y="120" class="label">Raw Response</text>
+  <rect class="tab" x="1085" y="98" width="95" height="34" rx="4" />
+  <text x="1101" y="120" class="label">Planner JSON</text>
+  <rect x="760" y="132" width="656" height="546" fill="#fbfbfb" stroke="#d1d5db" />
+  <text x="778" y="164" class="mono">SYSTEM HEADER</text>
+  <text x="778" y="196" class="mono"># Automation Planner v2</text>
+  <text x="778" y="228" class="mono">## Selected references</text>
+  <text x="798" y="252" class="mono">- planning-core.md</text>
+  <text x="798" y="276" class="mono">- surfaces/web.md</text>
+  <text x="798" y="300" class="mono">- patterns/form-fill.md</text>
+  <text x="778" y="340" class="mono">## Scenario with MockToolResponses</text>
+  <text x="798" y="364" class="mono">get_screen_state(): login form with username/password fields</text>
+  <text x="798" y="388" class="mono">ask_user(question): test user response</text>
+  <text x="778" y="428" class="mono">## User request</text>
+  <text x="798" y="452" class="mono">Log in to the portal and report success.</text>
+
+  <rect class="panel" x="12" y="724" width="1426" height="160" rx="5" />
+  <text x="24" y="752" class="header">Execution Console</text>
+  <rect x="24" y="764" width="1392" height="96" fill="#111827" stroke="#374151" />
+  <text x="42" y="794" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:13] Loaded planner package: automation-planner-v2</text>
+  <text x="42" y="820" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:16] Scenario enriched with MockToolResponses</text>
+  <text x="42" y="846" font-family="Consolas, monospace" font-size="14" fill="#d1fae5">[10:42:19] Planner response validated successfully</text>
+</svg>

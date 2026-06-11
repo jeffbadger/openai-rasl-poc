@@ -25,6 +25,19 @@ A .NET 8 WPF proof-of-concept that loads an Automation Planner skill package fro
 
 Settings are saved locally under the current user's application data folder and API keys are never hardcoded in source.
 
+
+## Screenshots
+
+The documentation includes illustrative screenshots of the WPF shell to show the primary workflows before running the Windows desktop app.
+
+### Main planner workspace
+
+![Automation Planner POC main window showing the planner package explorer, mock data JSON editor, execution result tabs, and execution console.](docs/screenshots/main-window.svg)
+
+### Settings dialog
+
+![Settings dialog showing OpenAI request options, planner package folder, and optional mock data base folder.](docs/screenshots/settings-window.svg)
+
 ## Folder-driven planner packages
 
 A planner package must contain:

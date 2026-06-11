@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="430" viewBox="0 0 640 430" role="img" aria-labelledby="title desc">
+  <title id="title">Automation Planner POC settings window screenshot</title>
+  <desc id="desc">Illustrative screenshot of the settings dialog with OpenAI model, request settings, planner package folder, and mock data base folder fields.</desc>
+  <defs>
+    <style>
+      .window { fill: #f7f7f7; stroke: #9a9a9a; }
+      .chrome { fill: #e9eef8; }
+      .label { font: 13px Segoe UI, Arial, sans-serif; fill: #374151; }
+      .value { font: 13px Consolas, monospace; fill: #1f2937; }
+      .input { fill: #ffffff; stroke: #b7b7b7; }
+      .button { fill: #f3f4f6; stroke: #9ca3af; }
+      .hint { font: 13px Segoe UI, Arial, sans-serif; fill: #6b7280; }
+    </style>
+  </defs>
+
+  <rect class="window" x="0.5" y="0.5" width="639" height="429" rx="8" />
+  <rect class="chrome" x="1" y="1" width="638" height="34" rx="8" />
+  <text x="18" y="23" class="label">Settings</text>
+
+  <text x="18" y="68" class="label">OpenAI API Key</text>
+  <rect class="input" x="198" y="50" width="406" height="28" />
+  <text x="210" y="69" class="value">••••••••••••••••••••••</text>
+
+  <text x="18" y="108" class="label">GPT Model</text>
+  <rect class="input" x="198" y="90" width="406" height="28" />
+  <text x="210" y="109" class="value">gpt-5.2</text>
+
+  <text x="18" y="148" class="label">Temperature</text>
+  <rect class="input" x="198" y="130" width="406" height="28" />
+  <text x="210" y="149" class="value">0</text>
+
+  <text x="18" y="188" class="label">Max Tokens</text>
+  <rect class="input" x="198" y="170" width="406" height="28" />
+  <text x="210" y="189" class="value">8192</text>
+
+  <text x="18" y="228" class="label">Request Timeout</text>
+  <rect class="input" x="198" y="210" width="406" height="28" />
+  <text x="210" y="229" class="value">120</text>
+
+  <text x="18" y="268" class="label">Planner Package Folder</text>
+  <rect class="input" x="198" y="250" width="318" height="28" />
+  <text x="210" y="269" class="value">C:\Planner\automation-planner-v2</text>
+  <rect class="button" x="526" y="250" width="78" height="28" rx="3" />
+  <text x="544" y="269" class="label">Browse</text>
+
+  <text x="18" y="308" class="label">Mock Data Base Folder</text>
+  <rect class="input" x="198" y="290" width="318" height="28" />
+  <text x="210" y="309" class="value">D:\SharedAutomationMocks</text>
+  <rect class="button" x="526" y="290" width="78" height="28" rx="3" />
+  <text x="544" y="309" class="label">Browse</text>
+
+  <text x="198" y="352" class="hint">Leave Mock Data Base Folder blank to use the selected planner package's mock-data folder.</text>
+
+  <rect class="button" x="458" y="382" width="80" height="30" rx="3" />
+  <text x="486" y="402" class="label">Save</text>
+  <rect class="button" x="548" y="382" width="80" height="30" rx="3" />
+  <text x="567" y="402" class="label">Cancel</text>
+</svg>
