@@ -1,0 +1,14 @@
+{
+  "Goal": "Use available callable tools to fetch account status and notify the operations channel if remediation is required.",
+  "SurfaceType": "Callable",
+  "ComponentType": "ToolOrchestration",
+  "ApplicationHierarchy": {},
+  "CompletedSteps": [],
+  "DurableMemory": ["Operations channel is #automation-ops."],
+  "MockRuntime": {
+    "CallableSignatures": [
+      { "Name": "get_account_status", "Parameters": ["accountId"] },
+      { "Name": "notify_channel", "Parameters": ["channel", "message"] }
+    ]
+  }
+}

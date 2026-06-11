@@ -1,0 +1,22 @@
+{
+  "Goal": "Log in to the customer portal and report whether the account dashboard is visible.",
+  "SurfaceType": "Web",
+  "ComponentType": "Browser",
+  "ApplicationHierarchy": {
+    "Window": "Customer Portal",
+    "Fields": ["Username", "Password"],
+    "Buttons": ["Sign in"],
+    "ExpectedDashboardText": "Welcome back"
+  },
+  "CompletedSteps": [],
+  "DurableMemory": [],
+  "MockRuntime": {
+    "ScreenState": {
+      "Url": "https://example.test/login",
+      "VisibleControls": ["Username", "Password", "Sign in"]
+    },
+    "AskUserResponses": {
+      "Credentials available?": "Use the test credential vault entry named customer-portal-demo."
+    }
+  }
+}
