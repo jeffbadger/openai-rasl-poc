@@ -1,0 +1,19 @@
+{
+  "Goal": "Read invoice rows from Excel, calculate totals by customer, and save a summary workbook.",
+  "SurfaceType": "Excel",
+  "ComponentType": "Workbook",
+  "ApplicationHierarchy": {
+    "Workbook": "Invoices.xlsx",
+    "Worksheets": ["Invoices", "Summary"]
+  },
+  "CompletedSteps": [],
+  "DurableMemory": [],
+  "MockRuntime": {
+    "ExcelStructure": {
+      "Worksheets": {
+        "Invoices": ["Customer", "InvoiceNumber", "Amount", "DueDate"],
+        "Summary": ["Customer", "TotalAmount"]
+      }
+    }
+  }
+}

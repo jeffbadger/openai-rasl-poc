@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutomationPlanner.POC.Models\AutomationPlanner.POC.Models.csproj" />
+  </ItemGroup>
+</Project>

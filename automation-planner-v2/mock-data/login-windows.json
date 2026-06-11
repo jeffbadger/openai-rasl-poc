@@ -1,0 +1,13 @@
+{
+  "Goal": "Open the desktop finance application and authenticate with the available test profile.",
+  "SurfaceType": "Windows",
+  "ComponentType": "DesktopApplication",
+  "ApplicationHierarchy": {
+    "ProcessName": "FinanceApp.exe",
+    "WindowTitle": "Finance Desktop Login",
+    "Fields": ["User ID", "Password"],
+    "Buttons": ["OK", "Cancel"]
+  },
+  "CompletedSteps": [],
+  "DurableMemory": []
+}
