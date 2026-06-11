@@ -25,6 +25,8 @@ public sealed class MockAutomationRuntimeTests
         """));
 
         var screenState = await runtime.InvokeToolAsync("get_screen_state");
+        var screenHierarchyAlias = await runtime.InvokeToolAsync("get_screen_hierarchy");
+        var screenHierarchyDashAlias = await runtime.InvokeToolAsync("get-screen-hierarchy");
         var excelStructure = await runtime.InvokeToolAsync("get_excel_structure");
         var callableSignatures = await runtime.InvokeToolAsync("get_callable_signatures");
         runtime.SetAskUserDefaultResponse("Answered from app.");
@@ -32,6 +34,8 @@ public sealed class MockAutomationRuntimeTests
         var custom = await runtime.InvokeToolAsync("custom_tool");
 
         Assert.Equal("Login", screenState["Window"]?.ToString());
+        Assert.Equal("Login", screenHierarchyAlias["Window"]?.ToString());
+        Assert.Equal("Login", screenHierarchyDashAlias["Window"]?.ToString());
         Assert.Equal("Invoices.xlsx", excelStructure["Workbook"]?.ToString());
         Assert.Equal("get_account_status", callableSignatures[0]?["Name"]?.ToString());
         Assert.Equal("Answered from app.", askUser.ToString());
@@ -75,6 +79,8 @@ public sealed class MockAutomationRuntimeTests
         var snapshot = await runtime.GetToolResponseSnapshotAsync();
 
         Assert.Equal("Username", snapshot["ToolResponseByName"]?["get_screen_state"]?["Response"]?["VisibleControls"]?[0]?.ToString());
+        Assert.Equal("Username", snapshot["ToolResponseByName"]?["get_screen_hierarchy"]?["Response"]?["VisibleControls"]?[0]?.ToString());
+        Assert.Equal("Username", snapshot["ToolResponseByName"]?["get-screen-hierarchy"]?["Response"]?["VisibleControls"]?[0]?.ToString());
         Assert.Equal(42, snapshot["ToolResponseByName"]?["custom_tool"]?["Response"]?["Value"]?.Value<int>());
         Assert.Equal(4, snapshot["ToolPackets"]?.Count());
     }

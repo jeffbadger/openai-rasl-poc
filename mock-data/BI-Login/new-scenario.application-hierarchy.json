@@ -1,0 +1,880 @@
+{
+  "ApplicationName": "BankerInsight",
+  "Technology": "Windows",
+  "TopLevelContainers": [
+    {
+      "ControlId": "WindowsForms10Window8app0141b42a_r14_ad1",
+      "ControlType": "Window",
+      "ElementReferenceId": 1,
+      "Metadata": {
+        "Name": "BankerInsight",
+        "Enabled": true
+      },
+      "ChildControls": [
+        {
+          "ControlId": "btnLogOff",
+          "ControlType": "Button",
+          "ElementReferenceId": 2,
+          "Metadata": {
+            "Name": "btnLogOff",
+            "Enabled": true,
+            "AccessibilityName": "Log Off",
+            "Text": "Log Off",
+            "TopLevelReferenceId": 1
+          }
+        },
+        {
+          "ControlId": "btnMinimize",
+          "ControlType": "Button",
+          "ElementReferenceId": 3,
+          "Metadata": {
+            "Name": "btnMinimize",
+            "Enabled": true,
+            "AccessibilityName": "_",
+            "Text": "_",
+            "TopLevelReferenceId": 1
+          }
+        },
+        {
+          "ControlId": "btnExit",
+          "ControlType": "Button",
+          "ElementReferenceId": 4,
+          "Metadata": {
+            "Name": "btnExit",
+            "Enabled": true,
+            "AccessibilityName": "X",
+            "Text": "X",
+            "TopLevelReferenceId": 1
+          }
+        },
+        {
+          "ControlId": "label30",
+          "ControlType": "Label",
+          "ElementReferenceId": 5,
+          "Metadata": {
+            "Name": "label30",
+            "Enabled": true,
+            "AccessibilityName": "Banker Insight",
+            "Text": "Banker Insight",
+            "TopLevelReferenceId": 1
+          }
+        },
+        {
+          "ControlId": "gboxAddAcct",
+          "ControlType": "GroupBox",
+          "ElementReferenceId": 6,
+          "Metadata": {
+            "Name": "gboxAddAcct",
+            "Enabled": false,
+            "AccessibilityName": "Add Account",
+            "Text": "Add Account",
+            "TopLevelReferenceId": 1
+          },
+          "ChildControls": [
+            {
+              "ControlId": "btnClearAdd",
+              "ControlType": "Button",
+              "ElementReferenceId": 7,
+              "Metadata": {
+                "Name": "btnClearAdd",
+                "Enabled": false,
+                "AccessibilityName": "Clear",
+                "Text": "Clear",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "txtAddAcctNum",
+              "ControlType": "TextBox",
+              "ElementReferenceId": 8,
+              "Metadata": {
+                "Name": "txtAddAcctNum",
+                "Enabled": false,
+                "AccessibilityName": "Account Number",
+                "MaxLength": 32767,
+                "ReadOnly": false,
+                "IsPassword": false,
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "label29",
+              "ControlType": "Label",
+              "ElementReferenceId": 9,
+              "Metadata": {
+                "Name": "label29",
+                "Enabled": false,
+                "AccessibilityName": "Account Number",
+                "Text": "Account Number",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "txtAddCreditLim",
+              "ControlType": "TextBox",
+              "ElementReferenceId": 10,
+              "Metadata": {
+                "Name": "txtAddCreditLim",
+                "Enabled": false,
+                "AccessibilityName": "Credit Limit",
+                "MaxLength": 32767,
+                "ReadOnly": false,
+                "IsPassword": false,
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "txtAddDescrip",
+              "ControlType": "TextBox",
+              "ElementReferenceId": 11,
+              "Metadata": {
+                "Name": "txtAddDescrip",
+                "Enabled": false,
+                "MaxLength": 32767,
+                "ReadOnly": false,
+                "IsPassword": false,
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "label21",
+              "ControlType": "Label",
+              "ElementReferenceId": 12,
+              "Metadata": {
+                "Name": "label21",
+                "Enabled": false,
+                "AccessibilityName": "Credit Limit",
+                "Text": "Credit Limit",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "cboxAcctType",
+              "ControlType": "ComboBox",
+              "ElementReferenceId": 13,
+              "Metadata": {
+                "Name": "cboxAcctType",
+                "Enabled": false,
+                "Count": 3,
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "label22",
+              "ControlType": "Label",
+              "ElementReferenceId": 14,
+              "Metadata": {
+                "Name": "label22",
+                "Enabled": false,
+                "AccessibilityName": "Description",
+                "Text": "Description",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "btnAddAcct",
+              "ControlType": "Button",
+              "ElementReferenceId": 15,
+              "Metadata": {
+                "Name": "btnAddAcct",
+                "Enabled": false,
+                "AccessibilityName": "Add",
+                "Text": "Add",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "label23",
+              "ControlType": "Label",
+              "ElementReferenceId": 16,
+              "Metadata": {
+                "Name": "label23",
+                "Enabled": false,
+                "AccessibilityName": "Account Type",
+                "Text": "Account Type",
+                "TopLevelReferenceId": 1
+              }
+            }
+          ]
+        },
+        {
+          "ControlId": "tabControl1",
+          "ControlType": "TabControl",
+          "ElementReferenceId": 17,
+          "Metadata": {
+            "Name": "tabControl1",
+            "Enabled": true,
+            "AccessibilityName": "Data: file 'data.json' loaded successfully.",
+            "Count": 4,
+            "Tabs": [
+              "Account Types",
+              "Account Transactions",
+              "Dispute",
+              "NSF History"
+            ],
+            "SelectedIndex": 0,
+            "TopLevelReferenceId": 1
+          },
+          "ChildControls": [
+            {
+              "ControlId": "tabPage1",
+              "ControlType": "TabPage",
+              "ElementReferenceId": 18,
+              "Metadata": {
+                "Name": "tabPage1",
+                "Enabled": true,
+                "AccessibilityName": "Account Types",
+                "TopLevelReferenceId": 1
+              },
+              "ChildControls": [
+                {
+                  "ControlId": "tbCreditLimit",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 19,
+                  "Metadata": {
+                    "Name": "tbCreditLimit",
+                    "Enabled": true,
+                    "MaxLength": 32767,
+                    "ReadOnly": true,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "tbOpenDate",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 20,
+                  "Metadata": {
+                    "Name": "tbOpenDate",
+                    "Enabled": true,
+                    "MaxLength": 32767,
+                    "ReadOnly": true,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "tbBalance",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 21,
+                  "Metadata": {
+                    "Name": "tbBalance",
+                    "Enabled": true,
+                    "MaxLength": 32767,
+                    "ReadOnly": true,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "tbAccount",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 22,
+                  "Metadata": {
+                    "Name": "tbAccount",
+                    "Enabled": true,
+                    "MaxLength": 32767,
+                    "ReadOnly": true,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "tbDescription",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 23,
+                  "Metadata": {
+                    "Name": "tbDescription",
+                    "Enabled": true,
+                    "MaxLength": 32767,
+                    "ReadOnly": true,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "rbtnNone",
+                  "ControlType": "RadioButton",
+                  "ElementReferenceId": 24,
+                  "Metadata": {
+                    "Name": "rbtnNone",
+                    "Enabled": false,
+                    "AccessibilityName": "None",
+                    "Text": "None",
+                    "Checked": false,
+                    "CheckState": "Unchecked",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "rbtnCreditCard",
+                  "ControlType": "RadioButton",
+                  "ElementReferenceId": 25,
+                  "Metadata": {
+                    "Name": "rbtnCreditCard",
+                    "Enabled": false,
+                    "AccessibilityName": "Credit Card",
+                    "Text": "Credit Card",
+                    "Checked": false,
+                    "CheckState": "Unchecked",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "rbtnSavings",
+                  "ControlType": "RadioButton",
+                  "ElementReferenceId": 26,
+                  "Metadata": {
+                    "Name": "rbtnSavings",
+                    "Enabled": false,
+                    "AccessibilityName": "Savings",
+                    "Text": "Savings",
+                    "Checked": false,
+                    "CheckState": "Unchecked",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "rbtnChecking",
+                  "ControlType": "RadioButton",
+                  "ElementReferenceId": 27,
+                  "Metadata": {
+                    "Name": "rbtnChecking",
+                    "Enabled": false,
+                    "AccessibilityName": "Checking",
+                    "Text": "Checking",
+                    "Checked": false,
+                    "CheckState": "Unchecked",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label20",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 28,
+                  "Metadata": {
+                    "Name": "label20",
+                    "Enabled": true,
+                    "AccessibilityName": "Transaction History",
+                    "Text": "Transaction History",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label18",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 29,
+                  "Metadata": {
+                    "Name": "label18",
+                    "Enabled": true,
+                    "AccessibilityName": "Credit Limit:",
+                    "Text": "Credit Limit:",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label17",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 30,
+                  "Metadata": {
+                    "Name": "label17",
+                    "Enabled": true,
+                    "AccessibilityName": "Description:",
+                    "Text": "Description:",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label11",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 31,
+                  "Metadata": {
+                    "Name": "label11",
+                    "Enabled": true,
+                    "AccessibilityName": "Opening Date:",
+                    "Text": "Opening Date:",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label12",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 32,
+                  "Metadata": {
+                    "Name": "label12",
+                    "Enabled": true,
+                    "AccessibilityName": "Balance:",
+                    "Text": "Balance:",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "dgvAcctTrans",
+                  "ControlType": "DataGridView",
+                  "ElementReferenceId": 33,
+                  "Metadata": {
+                    "Name": "dgvAcctTrans",
+                    "Enabled": true,
+                    "AccessibilityName": "DataGridView",
+                    "ColumnCount": 4,
+                    "RowCount": 0,
+                    "ColumnNames": [
+                      "clmnTrnasId",
+                      "clmnDate",
+                      "clmnDescrip",
+                      "clmnAmount"
+                    ],
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label10",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 34,
+                  "Metadata": {
+                    "Name": "label10",
+                    "Enabled": true,
+                    "AccessibilityName": "Account:",
+                    "Text": "Account:",
+                    "TopLevelReferenceId": 1
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "ControlId": "grpClientDetails",
+          "ControlType": "GroupBox",
+          "ElementReferenceId": 35,
+          "Metadata": {
+            "Name": "grpClientDetails",
+            "Enabled": true,
+            "AccessibilityName": "Client Details",
+            "Text": "Client Details",
+            "TopLevelReferenceId": 1
+          },
+          "ChildControls": [
+            {
+              "ControlId": "lblNotification",
+              "ControlType": "Label",
+              "ElementReferenceId": 36,
+              "Metadata": {
+                "Name": "lblNotification",
+                "Enabled": true,
+                "AccessibilityName": "Data: file 'data.json' loaded successfully.",
+                "Text": "Data: file 'data.json' loaded successfully.",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "lblCustomerSearchResult",
+              "ControlType": "Label",
+              "ElementReferenceId": 37,
+              "Metadata": {
+                "Name": "lblCustomerSearchResult",
+                "Enabled": true,
+                "Text": "",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "btnClear",
+              "ControlType": "Button",
+              "ElementReferenceId": 38,
+              "Metadata": {
+                "Name": "btnClear",
+                "Enabled": true,
+                "AccessibilityName": "Clear",
+                "Text": "Clear",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "btnSave",
+              "ControlType": "Button",
+              "ElementReferenceId": 39,
+              "Metadata": {
+                "Name": "btnSave",
+                "Enabled": true,
+                "AccessibilityName": "Save",
+                "Text": "Save",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "panel1",
+              "ControlType": "Panel",
+              "ElementReferenceId": 40,
+              "Metadata": {
+                "Name": "panel1",
+                "Enabled": true,
+                "TopLevelReferenceId": 1
+              },
+              "ChildControls": [
+                {
+                  "ControlId": "txtEmail",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 41,
+                  "Metadata": {
+                    "Name": "txtEmail",
+                    "Enabled": true,
+                    "AccessibilityName": "Notes",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label35",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 42,
+                  "Metadata": {
+                    "Name": "label35",
+                    "Enabled": true,
+                    "AccessibilityName": "Email Address",
+                    "Text": "Email Address",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtCustNotes",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 43,
+                  "Metadata": {
+                    "Name": "txtCustNotes",
+                    "Enabled": true,
+                    "AccessibilityName": "Email Address",
+                    "MaxLength": 255,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label19",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 44,
+                  "Metadata": {
+                    "Name": "label19",
+                    "Enabled": true,
+                    "AccessibilityName": "Notes",
+                    "Text": "Notes",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtPhone",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 45,
+                  "Metadata": {
+                    "Name": "txtPhone",
+                    "Enabled": true,
+                    "AccessibilityName": "Phone",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label8",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 46,
+                  "Metadata": {
+                    "Name": "label8",
+                    "Enabled": true,
+                    "AccessibilityName": "Phone",
+                    "Text": "Phone",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtZip",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 47,
+                  "Metadata": {
+                    "Name": "txtZip",
+                    "Enabled": true,
+                    "AccessibilityName": "ZIP",
+                    "MaxLength": 5,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label7",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 48,
+                  "Metadata": {
+                    "Name": "label7",
+                    "Enabled": true,
+                    "AccessibilityName": "ZIP",
+                    "Text": "ZIP",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtState",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 49,
+                  "Metadata": {
+                    "Name": "txtState",
+                    "Enabled": true,
+                    "AccessibilityName": "State",
+                    "MaxLength": 2,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label6",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 50,
+                  "Metadata": {
+                    "Name": "label6",
+                    "Enabled": true,
+                    "AccessibilityName": "State",
+                    "Text": "State",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtCity",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 51,
+                  "Metadata": {
+                    "Name": "txtCity",
+                    "Enabled": true,
+                    "AccessibilityName": "City",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label5",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 52,
+                  "Metadata": {
+                    "Name": "label5",
+                    "Enabled": true,
+                    "AccessibilityName": "City",
+                    "Text": "City",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtSSN",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 53,
+                  "Metadata": {
+                    "Name": "txtSSN",
+                    "Enabled": true,
+                    "AccessibilityName": "SSN",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": true,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtAddress",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 54,
+                  "Metadata": {
+                    "Name": "txtAddress",
+                    "Enabled": true,
+                    "AccessibilityName": "Address",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label4",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 55,
+                  "Metadata": {
+                    "Name": "label4",
+                    "Enabled": true,
+                    "AccessibilityName": "Address",
+                    "Text": "Address",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label9",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 56,
+                  "Metadata": {
+                    "Name": "label9",
+                    "Enabled": true,
+                    "AccessibilityName": "SSN",
+                    "Text": "SSN",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtFirstName",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 57,
+                  "Metadata": {
+                    "Name": "txtFirstName",
+                    "Enabled": true,
+                    "AccessibilityName": "First Name",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label3",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 58,
+                  "Metadata": {
+                    "Name": "label3",
+                    "Enabled": true,
+                    "AccessibilityName": "First Name",
+                    "Text": "First Name",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "txtLastName",
+                  "ControlType": "TextBox",
+                  "ElementReferenceId": 59,
+                  "Metadata": {
+                    "Name": "txtLastName",
+                    "Enabled": true,
+                    "AccessibilityName": "Last Name",
+                    "MaxLength": 32767,
+                    "ReadOnly": false,
+                    "IsPassword": false,
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "label2",
+                  "ControlType": "Label",
+                  "ElementReferenceId": 60,
+                  "Metadata": {
+                    "Name": "label2",
+                    "Enabled": true,
+                    "AccessibilityName": "Last Name",
+                    "Text": "Last Name",
+                    "TopLevelReferenceId": 1
+                  }
+                }
+              ]
+            },
+            {
+              "ControlId": "btnSearch",
+              "ControlType": "Button",
+              "ElementReferenceId": 61,
+              "Metadata": {
+                "Name": "btnSearch",
+                "Enabled": true,
+                "AccessibilityName": "Search",
+                "Text": "Search",
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "txtCustNum",
+              "ControlType": "TextBox",
+              "ElementReferenceId": 62,
+              "Metadata": {
+                "Name": "txtCustNum",
+                "Enabled": true,
+                "AccessibilityName": "Customer Number",
+                "MaxLength": 32767,
+                "ReadOnly": false,
+                "IsPassword": false,
+                "TopLevelReferenceId": 1
+              }
+            },
+            {
+              "ControlId": "label1",
+              "ControlType": "Label",
+              "ElementReferenceId": 63,
+              "Metadata": {
+                "Name": "label1",
+                "Enabled": true,
+                "AccessibilityName": "Customer Number",
+                "Text": "Customer Number",
+                "TopLevelReferenceId": 1
+              }
+            }
+          ]
+        },
+        {
+          "ControlId": "menuStrip1",
+          "ControlType": "MenuStrip",
+          "ElementReferenceId": 64,
+          "Metadata": {
+            "Name": "menuStrip1",
+            "Enabled": true,
+            "AccessibilityName": "menuStrip1",
+            "TopLevelReferenceId": 1
+          },
+          "ChildControls": [
+            {
+              "ControlId": "File",
+              "ControlType": "OpenSpan.Adapters.Virtual.VirtualTargets.VirtualMenuItem",
+              "ElementReferenceId": 65,
+              "Metadata": {
+                "Name": "File",
+                "TopLevelReferenceId": 1
+              },
+              "ChildControls": [
+                {
+                  "ControlId": "Save_Data",
+                  "ControlType": "OpenSpan.Adapters.Virtual.VirtualTargets.VirtualMenuItem",
+                  "ElementReferenceId": 66,
+                  "Metadata": {
+                    "Name": "Save_Data",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "Load_Data",
+                  "ControlType": "OpenSpan.Adapters.Virtual.VirtualTargets.VirtualMenuItem",
+                  "ElementReferenceId": 67,
+                  "Metadata": {
+                    "Name": "Load_Data",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "Log_off",
+                  "ControlType": "OpenSpan.Adapters.Virtual.VirtualTargets.VirtualMenuItem",
+                  "ElementReferenceId": 68,
+                  "Metadata": {
+                    "Name": "Log_off",
+                    "TopLevelReferenceId": 1
+                  }
+                },
+                {
+                  "ControlId": "E_xit",
+                  "ControlType": "OpenSpan.Adapters.Virtual.VirtualTargets.VirtualMenuItem",
+                  "ElementReferenceId": 69,
+                  "Metadata": {
+                    "Name": "E_xit",
+                    "TopLevelReferenceId": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

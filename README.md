@@ -73,7 +73,57 @@ Supported built-in mock tool keys are:
 - `CallableSignatures` for `get_callable_signatures()`
 - `ToolResponses` for additional named fake tool responses; each named response becomes its own packet
 
+The mock runtime accepts these screen-state tool name variants and maps them to the same `ScreenState` payload:
+
+- `get_screen_state`
+- `get_screen_hierarchy`
+- `get-screen-hierarchy`
+
 `ask_user(question)` is intentionally not included in `MockToolResponses` and is not backed by scenario mock-data questions because the planner can ask clarifying questions that are hard to anticipate. Instead, the OpenAI request registers `ask_user` as a real Responses API function tool. When the model calls that tool, the WPF app displays an `ask_user` dialog containing the model's question, pre-fills the answer box from the **ask_user app answer** field, and returns the submitted answer as a `function_call_output`.
+
+## Optional linked files in scenarios
+
+Each scenario JSON can keep large fields in separate files under the same mock-data base folder.
+
+- `UserRequestFile`: path to a text or markdown file containing the user request prompt text.
+- `ApplicationHierarchyFile`: path to a JSON file containing the `ApplicationHierarchy` object.
+- `CompletedStepsFile`: path to either a newline-delimited text file or JSON array for `CompletedSteps`.
+- `DurableMemoryFile`: path to a JSON object file for `DurableMemory`.
+
+In the main editor, CRUD now supports typed file creation per scenario folder:
+
+- Choose `File type` (Scenario, User Request, Application Hierarchy, Completed Steps, Durable Memory)
+- Provide a `Special scenario name`
+- Click `New` to generate a type-specific file path and starter template
+- Click `Scaffold` to create the full five-file bundle at once for that scenario folder and base name
+
+Generated names follow this pattern inside the selected use-case folder:
+
+- `<name>.scenario.json`
+- `<name>.user-request.md`
+- `<name>.application-hierarchy.json`
+- `<name>.completed-steps.txt`
+- `<name>.durable-memory.json`
+
+If neither `UserRequestFile` nor inline `UserRequest` is provided, the app builds the user request from these scenario fields:
+
+- `Goal`
+- `SurfaceType`
+- `TaskPrefix` (also supports `Task Prefix`)
+- `CompletedSteps` (or `CompletedStepSummaries`)
+- `DurableMemory`
+
+The generated request uses section headers (`# Goal`, `# Surface Type`, `# Task Prefix`, `# Completed Steps`, `# Durable Memory`) so planner rules that key off these sections can activate consistently.
+
+Resolution behavior:
+
+- Relative paths are resolved first from the scenario file's folder, then from the mock-data root.
+- Linked files must stay under the configured mock-data root.
+- `UserRequestFile` takes precedence over inline `UserRequest`; if neither exists, the default request is used.
+- Scenario-derived request sections are used when explicit `UserRequestFile`/`UserRequest` are not present.
+- `ApplicationHierarchyFile` overrides inline `ApplicationHierarchy` for execution.
+- `CompletedStepsFile` overrides inline `CompletedSteps` for execution.
+- `DurableMemoryFile` overrides inline `DurableMemory` for execution.
 
 ## How execution triggers a request
 

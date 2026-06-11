@@ -1,0 +1,2 @@
+navigation: Opened BankerInsight and reached Customer Lookup screen
+navigation: Focus moved to Customer Search section
