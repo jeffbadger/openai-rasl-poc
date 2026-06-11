@@ -4,11 +4,36 @@
   "ComponentType": "ToolOrchestration",
   "ApplicationHierarchy": {},
   "CompletedSteps": [],
-  "DurableMemory": ["Operations channel is #automation-ops."],
+  "DurableMemory": [
+    "Operations channel is #automation-ops."
+  ],
   "MockRuntime": {
     "CallableSignatures": [
-      { "Name": "get_account_status", "Parameters": ["accountId"] },
-      { "Name": "notify_channel", "Parameters": ["channel", "message"] }
-    ]
+      {
+        "Name": "get_account_status",
+        "Parameters": [
+          "accountId"
+        ]
+      },
+      {
+        "Name": "notify_channel",
+        "Parameters": [
+          "channel",
+          "message"
+        ]
+      }
+    ],
+    "ToolResponses": {
+      "get_account_status": {
+        "accountId": "demo-account-001",
+        "status": "NeedsRemediation",
+        "reason": "Pending compliance review"
+      },
+      "notify_channel": {
+        "channel": "#automation-ops",
+        "accepted": true,
+        "messageId": "mock-message-001"
+      }
+    }
   }
 }

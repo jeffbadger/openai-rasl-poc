@@ -15,6 +15,7 @@ public sealed class MainViewModel : ObservableObject
     private readonly IPromptAssembler _promptAssembler;
     private readonly IOpenAiPlannerClient _plannerClient;
     private readonly IPlannerValidator _validator;
+    private readonly IMockAutomationRuntime _mockAutomationRuntime;
     private readonly ISettingsStore _settingsStore;
     private readonly IExportService _exportService;
     private PlannerPackage? _plannerPackage;
@@ -30,12 +31,13 @@ public sealed class MainViewModel : ObservableObject
     private string _diagnosticsText = string.Empty;
     private AppSettings _settings = new();
 
-    public MainViewModel(IPlannerPackageLoader packageLoader, IPromptAssembler promptAssembler, IOpenAiPlannerClient plannerClient, IPlannerValidator validator, ISettingsStore settingsStore, IExportService exportService)
+    public MainViewModel(IPlannerPackageLoader packageLoader, IPromptAssembler promptAssembler, IOpenAiPlannerClient plannerClient, IPlannerValidator validator, IMockAutomationRuntime mockAutomationRuntime, ISettingsStore settingsStore, IExportService exportService)
     {
         _packageLoader = packageLoader;
         _promptAssembler = promptAssembler;
         _plannerClient = plannerClient;
         _validator = validator;
+        _mockAutomationRuntime = mockAutomationRuntime;
         _settingsStore = settingsStore;
         _exportService = exportService;
         ReloadPlannerCommand = new AsyncRelayCommand(ReloadPlannerAsync, () => !string.IsNullOrWhiteSpace(SelectedPlannerRoot));
@@ -101,7 +103,11 @@ public sealed class MainViewModel : ObservableObject
     {
         if (_plannerPackage is null) return;
         var scenario = ParseScenario("Ad hoc scenario", ScenarioJson);
-        var assembly = _promptAssembler.Assemble(_plannerPackage, scenario, "Create an automation plan for the supplied scenario.");
+        _mockAutomationRuntime.LoadScenario(scenario.Parsed!);
+        var toolSnapshot = await _mockAutomationRuntime.GetToolResponseSnapshotAsync();
+        var executionScenario = CreateScenarioWithToolResponses(scenario, toolSnapshot);
+        AppendConsole("Loaded mock tool responses from scenario mock data.");
+        var assembly = _promptAssembler.Assemble(_plannerPackage, executionScenario, "Create an automation plan for the supplied scenario.");
         PromptAssembly = assembly.AssembledPrompt;
         UpdateDiagnostics(assembly);
         AppendConsole($"Prompt assembled. Estimated tokens: {assembly.EstimatedTokens}.");
@@ -197,6 +203,19 @@ public sealed class MainViewModel : ObservableObject
     private static ScenarioDocument ParseScenario(string name, string json)
     {
         return new ScenarioDocument { Name = name, Json = json, Parsed = JObject.Parse(json) };
+    }
+
+    private static ScenarioDocument CreateScenarioWithToolResponses(ScenarioDocument scenario, JObject toolResponses)
+    {
+        var enriched = (JObject)(scenario.Parsed?.DeepClone() ?? JObject.Parse(scenario.Json));
+        enriched["MockToolResponses"] = toolResponses;
+        return new ScenarioDocument
+        {
+            Name = scenario.Name,
+            RelativePath = scenario.RelativePath,
+            Parsed = enriched,
+            Json = enriched.ToString(Newtonsoft.Json.Formatting.Indented)
+        };
     }
 
     private void UpdateDiagnostics(PromptAssembly? assembly = null)

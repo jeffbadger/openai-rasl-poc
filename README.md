@@ -46,6 +46,19 @@ If Mock Data Base Folder is blank, mock data defaults to the selected planner pa
 
 The app does not copy planner packages or mock data into AppData. AppData is used only for local user settings such as the selected planner package folder, mock data base folder, model name, timeout, and API key. If a team wants centrally managed mock data, place the mock data base folder in a shared repository or network folder and select that folder in the app.
 
+
+## Mock tool responses
+
+Mock automation tools are configured from each scenario's `MockRuntime` object. During execution, the app loads the selected scenario into `MockAutomationRuntime`, resolves the fake tool responses, and injects a `MockToolResponses` snapshot into the prompt scenario JSON so the planner can reason over the same data that the simulated tools would return.
+
+Supported built-in mock tool keys are:
+
+- `ScreenState` for `get_screen_state()`
+- `ExcelStructure` for `get_excel_structure()`
+- `CallableSignatures` for `get_callable_signatures()`
+- `AskUserResponses` for `ask_user(question)`
+- `ToolResponses` for additional named fake tool responses
+
 ## OpenAI integration
 
 The OpenAI client posts strongly typed request models to `/v1/responses`, supports cancellation, retries transient failures, records request duration, token usage, raw request JSON, and raw response JSON.

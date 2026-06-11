@@ -10,21 +10,22 @@ The POC is designed around provider-neutral interfaces so the desktop shell can 
 2. `IPlannerPackageLoader` reads `SKILL.md`, recursive markdown references, test files, and mock scenario JSON files from either the package `mock-data/` folder or a configured external mock data base folder.
 3. The UI lists package contents and scenarios.
 4. The user loads and optionally edits scenario JSON.
-5. `IPromptAssembler` composes the final prompt in this order:
+5. `IMockAutomationRuntime` loads the scenario mock data and produces a `MockToolResponses` snapshot for fake tools such as `get_screen_state()`, `get_excel_structure()`, `get_callable_signatures()`, and `ask_user()`.
+6. `IPromptAssembler` composes the final prompt in this order:
    - System header
    - `SKILL.md`
    - selected reference files
-   - scenario JSON
+   - scenario JSON enriched with `MockToolResponses`
    - user request
-6. `IOpenAiPlannerClient` sends the prompt to the OpenAI Responses API.
-7. `IPlannerValidator` validates that the response is JSON and includes the planner contract fields.
-8. Results are displayed in prompt, raw request, raw response, planner JSON, validation, diagnostics, and console views.
+7. `IOpenAiPlannerClient` sends the prompt to the OpenAI Responses API.
+8. `IPlannerValidator` validates that the response is JSON and includes the planner contract fields.
+9. Results are displayed in prompt, raw request, raw response, planner JSON, validation, diagnostics, and console views.
 
 ## Extensibility seams
 
 - `IReferenceSelectionStrategy` currently loads all references and can later select references by `SurfaceType`, `TaskPrefix`, or planner context.
 - `IOpenAiPlannerClient` isolates OpenAI-specific HTTP behavior from the rest of the app. Additional provider interfaces/implementations can be added for Azure OpenAI, local models, Anthropic, Gemini, or MCP-backed tools.
-- `IMockAutomationRuntime` simulates screen, Excel, callable, and user-interaction tools from scenario mock data.
+- `IMockAutomationRuntime` simulates screen, Excel, callable, and user-interaction tools from scenario `MockRuntime` data, and supports additional named fake tool responses through `MockRuntime.ToolResponses`.
 - Strongly typed planner response models support inheritance for decision, method, application, loop, label, and todo steps.
 
 ## Persistence
