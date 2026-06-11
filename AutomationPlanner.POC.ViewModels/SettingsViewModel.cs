@@ -19,6 +19,8 @@ public sealed class SettingsViewModel : ObservableObject
     public ICommand SaveCommand { get; }
     public AppSettings Settings { get => _settings; set => SetProperty(ref _settings, value); }
 
+    public void OnSettingsChanged() => OnPropertyChanged(nameof(Settings));
+
     public async Task LoadAsync() => Settings = await _settingsStore.LoadAsync();
     public Task SaveAsync() => _settingsStore.SaveAsync(Settings);
 }
