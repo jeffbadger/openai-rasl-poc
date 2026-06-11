@@ -76,7 +76,7 @@
   <text x="362" y="448" class="mono">&quot;UserRequest&quot;: &quot;Process a claim&quot;,</text>
   <text x="362" y="472" class="mono">&quot;MockRuntime&quot;: {</text>
   <text x="382" y="496" class="mono">&quot;ScreenState&quot;: { &quot;surface&quot;: &quot;web&quot; },</text>
-  <text x="382" y="520" class="mono">&quot;AskUserResponses&quot;: { ... }</text>
+  <text x="382" y="520" class="mono">&quot;ToolResponses&quot;: { ... }</text>
   <text x="362" y="544" class="mono">}</text>
   <text x="342" y="568" class="mono">}</text>
 

@@ -38,6 +38,8 @@
                     <ComboBox ItemsSource="{Binding UseCaseFolders}" SelectedItem="{Binding SelectedUseCaseFolder}"/>
                     <TextBlock Text="Mock-data scenario" Margin="0,6,0,0"/>
                     <ComboBox ItemsSource="{Binding Scenarios}" SelectedItem="{Binding SelectedScenario}" DisplayMemberPath="Name"/>
+                    <TextBlock Text="ask_user app answer" Margin="0,6,0,0"/>
+                    <TextBox Text="{Binding AskUserDefaultResponse, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap"/>
                     <TextBlock Text="File path under mock-data" Margin="0,6,0,0"/>
                     <TextBox Text="{Binding MockDataRelativePath, UpdateSourceTrigger=PropertyChanged}" FontFamily="Consolas"/>
                     <WrapPanel Margin="0,6,0,0">

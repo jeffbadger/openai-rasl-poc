@@ -9,7 +9,13 @@ public sealed class OpenAiPlannerRequest
     public string Model { get; set; } = "gpt-5.2";
 
     [JsonProperty("input")]
-    public List<OpenAiInputMessage> Input { get; set; } = [];
+    public List<JToken> Input { get; set; } = [];
+
+    [JsonProperty("tools", NullValueHandling = NullValueHandling.Ignore)]
+    public List<OpenAiToolDefinition>? Tools { get; set; }
+
+    [JsonProperty("parallel_tool_calls", NullValueHandling = NullValueHandling.Ignore)]
+    public bool? ParallelToolCalls { get; set; }
 
     [JsonProperty("temperature", NullValueHandling = NullValueHandling.Ignore)]
     public double? Temperature { get; set; }
@@ -34,6 +40,24 @@ public sealed class OpenAiInputContent
 
     [JsonProperty("text")]
     public string Text { get; set; } = string.Empty;
+}
+
+public sealed class OpenAiToolDefinition
+{
+    [JsonProperty("type")]
+    public string Type { get; set; } = "function";
+
+    [JsonProperty("name")]
+    public string Name { get; set; } = string.Empty;
+
+    [JsonProperty("description")]
+    public string Description { get; set; } = string.Empty;
+
+    [JsonProperty("parameters")]
+    public JObject Parameters { get; set; } = new();
+
+    [JsonProperty("strict", NullValueHandling = NullValueHandling.Ignore)]
+    public bool? Strict { get; set; }
 }
 
 public sealed class OpenAiPlannerResult

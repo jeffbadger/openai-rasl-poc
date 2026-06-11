@@ -5,5 +5,6 @@
     <PackageReference Include="xunit" Version="2.8.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1" />
     <ProjectReference Include="..\AutomationPlanner.POC.Services\AutomationPlanner.POC.Services.csproj" />
+    <ProjectReference Include="..\AutomationPlanner.POC.Infrastructure\AutomationPlanner.POC.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

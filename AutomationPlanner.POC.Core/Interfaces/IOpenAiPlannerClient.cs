@@ -5,5 +5,5 @@ namespace AutomationPlanner.POC.Core.Interfaces;
 
 public interface IOpenAiPlannerClient
 {
-    Task<OpenAiPlannerResult> CreatePlanAsync(string prompt, AppSettings settings, CancellationToken cancellationToken = default);
+    Task<OpenAiPlannerResult> CreatePlanAsync(string prompt, AppSettings settings, IMockAutomationRuntime automationRuntime, CancellationToken cancellationToken = default);
 }

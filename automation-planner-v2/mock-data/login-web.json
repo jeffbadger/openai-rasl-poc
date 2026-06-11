@@ -14,9 +14,6 @@
     "ScreenState": {
       "Url": "https://example.test/login",
       "VisibleControls": ["Username", "Password", "Sign in"]
-    },
-    "AskUserResponses": {
-      "Credentials available?": "Use the test credential vault entry named customer-portal-demo."
     }
   }
 }

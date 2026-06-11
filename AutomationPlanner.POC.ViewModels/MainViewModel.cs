@@ -31,6 +31,7 @@ public sealed class MainViewModel : ObservableObject
     private string _validationText = string.Empty;
     private string _consoleText = string.Empty;
     private string _diagnosticsText = string.Empty;
+    private string _askUserDefaultResponse = "Mock user approved.";
     private AppSettings _settings = new();
 
     public MainViewModel(IPlannerPackageLoader packageLoader, IPromptAssembler promptAssembler, IOpenAiPlannerClient plannerClient, IPlannerValidator validator, IMockAutomationRuntime mockAutomationRuntime, ISettingsStore settingsStore, IExportService exportService)
@@ -106,6 +107,7 @@ public sealed class MainViewModel : ObservableObject
     public string ValidationText { get => _validationText; set => SetProperty(ref _validationText, value); }
     public string ConsoleText { get => _consoleText; set => SetProperty(ref _consoleText, value); }
     public string DiagnosticsText { get => _diagnosticsText; set => SetProperty(ref _diagnosticsText, value); }
+    public string AskUserDefaultResponse { get => _askUserDefaultResponse; set => SetProperty(ref _askUserDefaultResponse, value); }
     public AppSettings Settings { get => _settings; set => SetProperty(ref _settings, value); }
 
     public async Task InitializeAsync()
@@ -132,6 +134,11 @@ public sealed class MainViewModel : ObservableObject
         RaiseCommands();
     }
 
+    public void SetAskUserResponder(Func<string, CancellationToken, Task<string>> responder)
+    {
+        _mockAutomationRuntime.SetAskUserResponder(responder);
+    }
+
     public void LoadSelectedScenario()
     {
         if (SelectedScenario is null) return;
@@ -145,15 +152,16 @@ public sealed class MainViewModel : ObservableObject
         if (_plannerPackage is null) return;
         var scenario = ParseScenario("Ad hoc scenario", ScenarioJson);
         _mockAutomationRuntime.LoadScenario(scenario.Parsed!);
+        _mockAutomationRuntime.SetAskUserDefaultResponse(AskUserDefaultResponse);
         var toolSnapshot = await _mockAutomationRuntime.GetToolResponseSnapshotAsync();
         var executionScenario = CreateScenarioWithToolResponses(scenario, toolSnapshot);
-        AppendConsole("Loaded mock tool responses from scenario mock data.");
+        AppendConsole("Loaded per-tool response packets; ask_user questions will be answered through the app prompt UI.");
         var assembly = _promptAssembler.Assemble(_plannerPackage, executionScenario, "Create an automation plan for the supplied scenario.");
         PromptAssembly = assembly.AssembledPrompt;
         UpdateDiagnostics(assembly);
         AppendConsole($"Prompt assembled. Estimated tokens: {assembly.EstimatedTokens}.");
 
-        OpenAiPlannerResult result = await _plannerClient.CreatePlanAsync(assembly.AssembledPrompt, Settings);
+        OpenAiPlannerResult result = await _plannerClient.CreatePlanAsync(assembly.AssembledPrompt, Settings, _mockAutomationRuntime);
         RawRequest = result.RawRequest;
         RawResponse = result.RawResponse;
         PlannerJson = result.OutputText;

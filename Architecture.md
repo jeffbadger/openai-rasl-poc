@@ -11,14 +11,14 @@ The POC is designed around provider-neutral interfaces so the desktop shell can 
 3. The UI lists package contents, the resolved mock-data root and child folders, and scenarios filtered by the selected execution use-case folder.
 4. The user selects a use-case folder, loads a scenario from that scope, and optionally edits scenario JSON.
 5. Clicking **Execute** triggers the WPF button binding for `ExecuteCommand`; `AsyncRelayCommand` invokes `MainViewModel.ExecuteAsync` when a planner package is loaded and scenario JSON is available.
-6. `IMockAutomationRuntime` loads the scenario mock data and produces a `MockToolResponses` snapshot for fake tools such as `get_screen_state()`, `get_excel_structure()`, `get_callable_signatures()`, and `ask_user()`.
+6. `IMockAutomationRuntime` loads the scenario mock data and produces packetized `MockToolResponses` for fake tools such as `get_screen_state()`, `get_excel_structure()`, `get_callable_signatures()`, and additional named tool responses; `ask_user()` is excluded from mock-data packets and is handled as a real Responses API function tool.
 7. `IPromptAssembler` composes the final prompt in this order:
    - System header
    - `SKILL.md`
    - selected reference files
    - scenario JSON enriched with `MockToolResponses`
    - user request
-8. `IOpenAiPlannerClient` serializes the Responses API request model and sends it to `/v1/responses`.
+8. `IOpenAiPlannerClient` serializes the Responses API request model, registers the real `ask_user` function tool, sends requests to `/v1/responses`, and loops over any returned function calls by executing the tool and submitting `function_call_output` items.
 9. `IPlannerValidator` validates that the response is JSON and includes the planner contract fields.
 10. Results are displayed in prompt, raw request, raw response, planner JSON, validation, diagnostics, and console views.
 
@@ -26,7 +26,7 @@ The POC is designed around provider-neutral interfaces so the desktop shell can 
 
 - `IReferenceSelectionStrategy` currently loads all references and can later select references by `SurfaceType`, `TaskPrefix`, or planner context.
 - `IOpenAiPlannerClient` isolates OpenAI-specific HTTP behavior from the rest of the app. Additional provider interfaces/implementations can be added for Azure OpenAI, local models, Anthropic, Gemini, or MCP-backed tools.
-- `IMockAutomationRuntime` simulates screen, Excel, callable, and user-interaction tools from scenario `MockRuntime` data, and supports additional named fake tool responses through `MockRuntime.ToolResponses`.
+- `IMockAutomationRuntime` simulates screen, Excel, and callable tools from scenario `MockRuntime` data, supports additional named fake tool responses through `MockRuntime.ToolResponses`, emits each mock-data response as an individual packet, and delegates real `ask_user()` function calls to an app-provided responder that displays the WPF clarification dialog.
 - Strongly typed planner response models support inheritance for decision, method, application, loop, label, and todo steps.
 
 ## Persistence
