@@ -64,20 +64,20 @@ The app does not copy planner packages or mock data into AppData. AppData is use
 
 ## Mock tool responses
 
-Mock automation tools are configured from each scenario's `MockRuntime` object. During execution, the app loads the selected scenario into `MockAutomationRuntime`, resolves the fake tool responses, and injects a `MockToolResponses` snapshot into the prompt scenario JSON so the planner can reason over the same data that the simulated tools would return.
+Mock automation tools are configured from each scenario's `MockRuntime` object. During execution, the app loads the selected scenario into `MockAutomationRuntime`, resolves the fake tool responses, and injects a `MockToolResponses` snapshot into the prompt scenario JSON so the planner can reason over the same data that the simulated tools would return. The snapshot is packetized: each mock-data response is represented as its own item in `MockToolResponses.ToolPackets`, with a `ToolName`, `Arguments`, `Response`, and `Source`, plus a `ToolResponseByName` convenience map for lookup by tool name.
 
 Supported built-in mock tool keys are:
 
 - `ScreenState` for `get_screen_state()`
 - `ExcelStructure` for `get_excel_structure()`
 - `CallableSignatures` for `get_callable_signatures()`
-- `AskUserResponses` for `ask_user(question)`
-- `ToolResponses` for additional named fake tool responses
+- `ToolResponses` for additional named fake tool responses; each named response becomes its own packet
 
+`ask_user(question)` is intentionally not included in `MockToolResponses` and is not backed by scenario mock-data questions because the planner can ask clarifying questions that are hard to anticipate. Instead, the OpenAI request registers `ask_user` as a real Responses API function tool. When the model calls that tool, the WPF app displays an `ask_user` dialog containing the model's question, pre-fills the answer box from the **ask_user app answer** field, and returns the submitted answer as a `function_call_output`.
 
 ## How execution triggers a request
 
-The **Execute** button is bound to `ExecuteCommand` in the main view model. WPF invokes that command when the button is clicked, and the command runs `ExecuteAsync` only when a planner package is loaded and the scenario JSON is not blank. `ExecuteAsync` parses the editor JSON, loads it into the mock automation runtime, captures mock tool responses, assembles the prompt, and then calls `IOpenAiPlannerClient.CreatePlanAsync`. The OpenAI client serializes the request model and posts it to `/v1/responses`; the resulting raw request, raw response, planner JSON, validation output, and console messages are displayed in the execution result tabs.
+The **Execute** button is bound to `ExecuteCommand` in the main view model. WPF invokes that command when the button is clicked, and the command runs `ExecuteAsync` only when a planner package is loaded and the scenario JSON is not blank. `ExecuteAsync` parses the editor JSON, loads it into the mock automation runtime, applies the app-provided `ask_user` default answer, captures packetized mock-data tool responses, assembles the prompt, and then calls `IOpenAiPlannerClient.CreatePlanAsync`. The OpenAI client serializes the request model with the real `ask_user` function tool and posts it to `/v1/responses`; when tool calls are returned, it appends `function_call_output` items and continues the Responses API turn loop until a final planner response is returned. The resulting raw request, raw response, planner JSON, validation output, and console messages are displayed in the execution result tabs.
 
 ## OpenAI integration
 

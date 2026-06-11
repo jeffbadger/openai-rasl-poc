@@ -5,6 +5,8 @@ namespace AutomationPlanner.POC.Core.Interfaces;
 public interface IMockAutomationRuntime
 {
     void LoadScenario(JObject scenario);
+    void SetAskUserDefaultResponse(string response);
+    void SetAskUserResponder(Func<string, CancellationToken, Task<string>> responder);
     Task<JObject> GetScreenStateAsync(CancellationToken cancellationToken = default);
     Task<JObject> GetExcelStructureAsync(CancellationToken cancellationToken = default);
     Task<JArray> GetCallableSignaturesAsync(CancellationToken cancellationToken = default);

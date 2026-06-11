@@ -5,9 +5,22 @@ namespace AutomationPlanner.POC.Services.Runtime;
 
 public sealed class MockAutomationRuntime : IMockAutomationRuntime
 {
+    private const string DefaultAskUserResponse = "Mock user approved.";
     private JObject _scenario = new();
+    private string _askUserDefaultResponse = DefaultAskUserResponse;
+    private Func<string, CancellationToken, Task<string>>? _askUserResponder;
 
     public void LoadScenario(JObject scenario) => _scenario = scenario;
+
+    public void SetAskUserDefaultResponse(string response)
+    {
+        _askUserDefaultResponse = string.IsNullOrWhiteSpace(response) ? DefaultAskUserResponse : response.Trim();
+    }
+
+    public void SetAskUserResponder(Func<string, CancellationToken, Task<string>> responder)
+    {
+        _askUserResponder = responder;
+    }
 
     public Task<JObject> GetScreenStateAsync(CancellationToken cancellationToken = default)
     {
@@ -29,10 +42,13 @@ public sealed class MockAutomationRuntime : IMockAutomationRuntime
         return Task.FromResult((JArray)value.DeepClone());
     }
 
-    public Task<string> AskUserAsync(string question, CancellationToken cancellationToken = default)
+    public async Task<string> AskUserAsync(string question, CancellationToken cancellationToken = default)
     {
-        var answer = _scenario["MockRuntime"]?["AskUserResponses"]?[question]?.ToString() ?? "Mock user approved.";
-        return Task.FromResult(answer);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (_askUserResponder is null) return _askUserDefaultResponse;
+
+        var response = await _askUserResponder(question, cancellationToken);
+        return string.IsNullOrWhiteSpace(response) ? _askUserDefaultResponse : response.Trim();
     }
 
     public async Task<JToken> InvokeToolAsync(string toolName, JObject? arguments = null, CancellationToken cancellationToken = default)
@@ -59,19 +75,42 @@ public sealed class MockAutomationRuntime : IMockAutomationRuntime
 
     public async Task<JObject> GetToolResponseSnapshotAsync(CancellationToken cancellationToken = default)
     {
-        var askUserResponses = _scenario["MockRuntime"]?["AskUserResponses"] as JObject ?? new JObject();
+        var packets = new JArray
+        {
+            CreatePacket("get_screen_state", new JObject(), await GetScreenStateAsync(cancellationToken), "MockRuntime.ScreenState or ApplicationHierarchy"),
+            CreatePacket("get_excel_structure", new JObject(), await GetExcelStructureAsync(cancellationToken), "MockRuntime.ExcelStructure"),
+            CreatePacket("get_callable_signatures", new JObject(), await GetCallableSignaturesAsync(cancellationToken), "MockRuntime.CallableSignatures")
+        };
+
+        var byName = new JObject();
+        foreach (var packet in packets.OfType<JObject>())
+        {
+            byName[packet["ToolName"]?.ToString() ?? string.Empty] = packet.DeepClone();
+        }
+
         var explicitToolResponses = _scenario["MockRuntime"]?["ToolResponses"] as JObject ?? new JObject();
+        foreach (var response in explicitToolResponses.Properties())
+        {
+            var packet = CreatePacket(response.Name, new JObject(), response.Value, "MockRuntime.ToolResponses");
+            packets.Add(packet);
+            byName[response.Name] = packet.DeepClone();
+        }
+
         return new JObject
         {
-            ["get_screen_state"] = await GetScreenStateAsync(cancellationToken),
-            ["get_excel_structure"] = await GetExcelStructureAsync(cancellationToken),
-            ["get_callable_signatures"] = await GetCallableSignaturesAsync(cancellationToken),
-            ["ask_user"] = new JObject
-            {
-                ["configured_responses"] = (JObject)askUserResponses.DeepClone(),
-                ["default_response"] = "Mock user approved."
-            },
-            ["explicit_tool_responses"] = (JObject)explicitToolResponses.DeepClone()
+            ["ToolPackets"] = packets,
+            ["ToolResponseByName"] = byName
+        };
+    }
+
+    private static JObject CreatePacket(string toolName, JObject arguments, JToken response, string source)
+    {
+        return new JObject
+        {
+            ["ToolName"] = toolName,
+            ["Arguments"] = (JObject)arguments.DeepClone(),
+            ["Response"] = response.DeepClone(),
+            ["Source"] = source
         };
     }
 
