@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0-windows</TargetFramework><UseWPF>true</UseWPF><EnableWindowsTargeting>true</EnableWindowsTargeting></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AutomationPlanner.POC.ViewModels\AutomationPlanner.POC.ViewModels.csproj" />
+  </ItemGroup>
+</Project>
