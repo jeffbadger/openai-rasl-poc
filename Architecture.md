@@ -7,7 +7,7 @@ The POC is designed around provider-neutral interfaces so the desktop shell can 
 ## Execution flow
 
 1. The user selects a planner package root.
-2. `IPlannerPackageLoader` reads `SKILL.md`, recursive markdown references, test files, and mock scenario JSON files.
+2. `IPlannerPackageLoader` reads `SKILL.md`, recursive markdown references, test files, and mock scenario JSON files from either the package `mock-data/` folder or a configured external mock data base folder.
 3. The UI lists package contents and scenarios.
 4. The user loads and optionally edits scenario JSON.
 5. `IPromptAssembler` composes the final prompt in this order:
@@ -31,4 +31,4 @@ The POC is designed around provider-neutral interfaces so the desktop shell can 
 
 `JsonSettingsStore` saves local settings under the user application data folder. Secrets are user-provided at runtime and are not checked into the repository.
 
-Planner packages, references, tests, and mock scenario data are not persisted or duplicated into AppData. They remain in the folder selected by the user and are loaded directly from that folder on reload/execution. AppData stores only preferences and the last selected planner package path.
+Planner packages, references, tests, and mock scenario data are not persisted or duplicated into AppData. The planner package path and optional mock data base path are user-configurable settings; package files and mock scenarios are loaded directly from those folders on reload/execution. AppData stores only preferences, including the selected planner package path and mock data base path.

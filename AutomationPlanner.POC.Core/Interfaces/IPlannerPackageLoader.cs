@@ -4,5 +4,5 @@ namespace AutomationPlanner.POC.Core.Interfaces;
 
 public interface IPlannerPackageLoader
 {
-    Task<PlannerPackage> LoadAsync(string rootPath, CancellationToken cancellationToken = default);
+    Task<PlannerPackage> LoadAsync(string rootPath, string? mockDataBasePath = null, CancellationToken cancellationToken = default);
 }

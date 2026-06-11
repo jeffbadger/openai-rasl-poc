@@ -19,8 +19,8 @@ A .NET 8 WPF proof-of-concept that loads an Automation Planner skill package fro
 2. Open `AutomationPlanner.POC.sln` in Visual Studio 2022 or newer.
 3. Set `AutomationPlanner.POC` as the startup project.
 4. Run the application.
-5. Open **Settings**, enter an OpenAI API key, and save.
-6. Use **Browse Folder** to select `automation-planner-v2`.
+5. Open **Settings**, enter an OpenAI API key, set the planner package folder, optionally set a separate mock data base folder, and save.
+6. Alternatively, use **Browse Folder** on the main window to select `automation-planner-v2`.
 7. Click **Reload Planner**, select a scenario, click **Load Scenario**, then **Execute**.
 
 Settings are saved locally under the current user's application data folder and API keys are never hardcoded in source.
@@ -36,13 +36,15 @@ tests/
 mock-data/
 ```
 
-The loader recursively reads `references/**/*.md` and discovers scenarios from `mock-data/**/*.json`. Adding new planner packages, reference files, scenarios, or mock data does not require code changes.
+The loader recursively reads `references/**/*.md` and discovers scenarios from either the package `mock-data/**/*.json` folder or the configured external mock data base folder. Adding new planner packages, reference files, scenarios, or mock data does not require code changes.
 
-## Mock data storage
+## Planner package and mock data storage
 
-Mock data lives inside the selected planner package folder, under its `mock-data/` directory. For example, if the user selects `C:\PlannerPackages\AutomationPlannerV2`, scenarios are discovered from `C:\PlannerPackages\AutomationPlannerV2\mock-data\**\*.json`. The app does not copy planner packages or mock data into AppData.
+The Settings screen has separate folder fields for the automation planner package and the mock data base folder. The planner package folder points to the directory containing `SKILL.md`, `references/`, and `tests/`. The mock data base folder points to the directory whose recursive JSON files should be treated as scenarios.
 
-AppData is used only for local user settings such as the last selected planner package path, model name, timeout, and API key. If a team wants centrally managed mock data, place the planner package in a shared repository or network folder and select that folder in the app.
+If Mock Data Base Folder is blank, mock data defaults to the selected planner package's `mock-data/` directory. For example, if the planner package is `C:\PlannerPackages\AutomationPlannerV2`, scenarios are discovered from `C:\PlannerPackages\AutomationPlannerV2\mock-data\**\*.json`. If Mock Data Base Folder is set to `D:\AutomationMocks`, scenarios are discovered from `D:\AutomationMocks\**\*.json` instead.
+
+The app does not copy planner packages or mock data into AppData. AppData is used only for local user settings such as the selected planner package folder, mock data base folder, model name, timeout, and API key. If a team wants centrally managed mock data, place the mock data base folder in a shared repository or network folder and select that folder in the app.
 
 ## OpenAI integration
 

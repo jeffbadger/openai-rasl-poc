@@ -71,13 +71,16 @@ public sealed class MainViewModel : ObservableObject
     {
         Settings = await _settingsStore.LoadAsync();
         SettingsViewModel.Settings = Settings;
-        if (!string.IsNullOrWhiteSpace(Settings.LastPlannerPackagePath)) SelectedPlannerRoot = Settings.LastPlannerPackagePath;
+        SelectedPlannerRoot = !string.IsNullOrWhiteSpace(Settings.PlannerPackagePath)
+            ? Settings.PlannerPackagePath
+            : Settings.LastPlannerPackagePath;
     }
 
     public async Task ReloadPlannerAsync()
     {
         AppendConsole($"Loading planner package: {SelectedPlannerRoot}");
-        _plannerPackage = await _packageLoader.LoadAsync(SelectedPlannerRoot);
+        _plannerPackage = await _packageLoader.LoadAsync(SelectedPlannerRoot, Settings.MockDataBasePath);
+        Settings.PlannerPackagePath = SelectedPlannerRoot;
         Settings.LastPlannerPackagePath = SelectedPlannerRoot;
         await _settingsStore.SaveAsync(Settings);
         RefreshPackageTree();
@@ -167,6 +170,7 @@ public sealed class MainViewModel : ObservableObject
         PackageTree.Add($"tests ({_plannerPackage.TestFiles.Count})");
         foreach (var test in _plannerPackage.TestFiles.Keys) PackageTree.Add("  " + test);
         PackageTree.Add($"mock-data ({_plannerPackage.MockDataFiles.Count})");
+        PackageTree.Add($"  root: {_plannerPackage.MockDataRootPath}");
         foreach (var mock in _plannerPackage.MockDataFiles.Keys) PackageTree.Add("  " + mock);
     }
 
